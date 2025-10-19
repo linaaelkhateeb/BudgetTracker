@@ -4,7 +4,406 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Budgets - Budget Tracker</title>
-    <link rel="stylesheet" href="css/style1.css">
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        /* Additional styles for budget page */
+        .app-container {
+            min-height: 100vh;
+            display: grid;
+            grid-template-columns: 250px 1fr;
+            gap: 2rem;
+            padding: 2rem;
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        /* Header */
+        .header {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(6px);
+            border-bottom: 1px solid rgba(198, 184, 162, 0.55);
+            padding: 1rem 0;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0 2rem;
+        }
+
+        .logo {
+            font-family: "Poppins", sans-serif;
+            font-weight: 800;
+            font-size: 1.8rem;
+            color: var(--primary);
+            text-decoration: none;
+            transition: transform 0.3s ease, color 0.3s ease;
+        }
+
+        .logo:hover {
+            transform: translateY(-2px);
+            color: var(--accent);
+        }
+
+        .user-menu {
+            font-weight: 600;
+            color: var(--support-1);
+        }
+
+        /* Sidebar */
+        .sidebar {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(198, 184, 162, 0.55);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 1.5rem;
+            height: fit-content;
+            position: sticky;
+            top: 2rem;
+        }
+
+        .sidebar-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-nav li {
+            margin-bottom: 0.5rem;
+        }
+
+        .sidebar-nav a {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            text-decoration: none;
+            color: var(--text);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            font-weight: 600;
+        }
+
+        .sidebar-nav a:hover {
+            background: rgba(123, 75, 58, 0.1);
+            transform: translateX(5px);
+            color: var(--primary);
+        }
+
+        .sidebar-nav a.active {
+            background: var(--primary);
+            color: white;
+            box-shadow: 0 6px 16px rgba(123, 75, 58, 0.22);
+        }
+
+        /* Main Content */
+        .main-content {
+            background: rgba(255, 255, 255, 0.88);
+            backdrop-filter: blur(6px);
+            border: 1px solid rgba(198, 184, 162, 0.55);
+            border-radius: var(--radius);
+            box-shadow: var(--shadow);
+            padding: 2rem;
+        }
+
+        .page-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 2px solid rgba(198, 184, 162, 0.3);
+        }
+
+        .page-title {
+            font-weight: 800;
+            color: var(--primary);
+            font-size: 2.2rem;
+            margin: 0;
+        }
+
+        /* Buttons */
+        .btn {
+            padding: 0.75rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            font-family: "Poppins", sans-serif;
+            font-weight: 600;
+            cursor: pointer;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+        }
+
+        .btn:active {
+            transform: translateY(-1px);
+        }
+
+        .btn-success {
+            background: var(--support-1);
+            color: white;
+        }
+
+        .btn-primary {
+            background: var(--primary);
+            color: white;
+        }
+
+        .btn-danger {
+            background: #e74c3c;
+            color: white;
+        }
+
+        /* Budgets Grid */
+        .budgets-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        /* Budget Card */
+        .budget-card {
+            background: white;
+            border-radius: var(--radius);
+            border: 1px solid rgba(198, 184, 162, 0.6);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.08);
+            padding: 1.5rem;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .budget-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--primary), var(--accent));
+        }
+
+        .budget-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.14);
+        }
+
+        .budget-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .budget-category {
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.3rem;
+            margin: 0;
+        }
+
+        .budget-amount {
+            font-weight: 600;
+            color: var(--support-1);
+            font-size: 1.1rem;
+        }
+
+        /* Progress Bar */
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(198, 184, 162, 0.3);
+            border-radius: 10px;
+            overflow: hidden;
+            margin: 1rem 0;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--support-1), var(--primary));
+            border-radius: 10px;
+            transition: width 0.5s ease;
+        }
+
+        .progress-fill.over-budget {
+            background: linear-gradient(90deg, #e74c3c, #c0392b);
+        }
+
+        /* Budget Details */
+        .budget-details {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        .budget-details span:last-child {
+            color: var(--support-1);
+        }
+
+        .budget-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .budget-actions .btn {
+            flex: 1;
+            justify-content: center;
+            padding: 0.5rem 1rem;
+            font-size: 0.9rem;
+        }
+
+        /* Modal Styles */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        .modal-content {
+            background: white;
+            margin: 10% auto;
+            padding: 2rem;
+            border-radius: var(--radius);
+            width: 90%;
+            max-width: 500px;
+            animation: slideUp 0.3s ease;
+            border: 1px solid rgba(198, 184, 162, 0.6);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 600;
+            color: var(--support-1);
+            font-family: "Poppins", sans-serif;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border: 1px solid rgba(198, 184, 162, 0.75);
+            border-radius: 10px;
+            background: #fff;
+            transition: all 0.3s ease;
+            font-family: "Open Sans", sans-serif;
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            border-color: var(--accent);
+            box-shadow: 0 0 0 0.25rem rgba(161, 104, 85, 0.25);
+            transform: translateY(-2px);
+            outline: none;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            margin-top: 2rem;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .app-container {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+                gap: 1rem;
+            }
+            
+            .sidebar {
+                position: static;
+                order: 2;
+            }
+            
+            .main-content {
+                order: 1;
+            }
+            
+            .page-header {
+                flex-direction: column;
+                gap: 1rem;
+                align-items: flex-start;
+            }
+            
+            .budgets-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .header-content {
+                padding: 0 1rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .main-content {
+                padding: 1rem;
+            }
+            
+            .modal-content {
+                margin: 5% auto;
+                padding: 1.5rem;
+            }
+            
+            .budget-actions {
+                flex-direction: column;
+            }
+        }
+
+        /* Animation for new budget cards */
+        @keyframes cardAppear {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .budget-card {
+            animation: cardAppear 0.5s ease;
+        }
+    </style>
 </head>
 <body>
     <!-- Header -->
