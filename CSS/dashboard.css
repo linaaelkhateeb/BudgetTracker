@@ -351,278 +351,7 @@
           color: var(--primary);
         }
 
-        /* Recent Transactions */
-        .transactions-section {
-          padding: 80px 5%;
-        }
-
-        .transactions-container {
-          max-width: 900px;
-          margin: 0 auto;
-          opacity: 0;
-          transform: translateY(50px);
-          transition: all 0.8s ease;
-        }
-
-        .transactions-container.visible {
-          opacity: 1;
-          transform: translateY(0);
-        }
-
-       .transaction-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px;
-  margin-bottom: 15px;
-
-  /* outline-only */
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.12);
-  backdrop-filter: blur(6px);
-  border-radius: var(--radius);
-  box-shadow: 0 8px 18px rgba(47,43,40,0.05);
-
-  transition: all 0.3s ease;
-  position: relative;
-  overflow: hidden;
-}
-
-
-        .transaction-item::before {
-          content: '';
-          position: absolute;
-          left: 0;
-          top: 0;
-          height: 100%;
-          width: 5px;
-        }
-
-        .transaction-income::before {
-          background: var(--support-1);
-        }
-
-        .transaction-expense::before {
-          background: var(--accent);
-        }
-
-        .transaction-item:hover {
-          transform: translateX(10px);
-        }
-
-        .transaction-details {
-          display: flex;
-          align-items: center;
-          gap: 15px;
-        }
-
-        .transaction-icon {
-          width: 50px;
-          height: 50px;
-          border-radius: 50%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          color: white;
-          font-size: 1.2rem;
-        }
-
-        .transaction-income .transaction-icon {
-          background: var(--support-1);
-        }
-
-        .transaction-expense .transaction-icon {
-          background: var(--accent);
-        }
-
-        .transaction-info h4 {
-          margin: 0;
-          font-weight: 600;
-        }
-
-        .transaction-info p {
-          margin: 5px 0 0;
-          color: #6c757d;
-        }
-
-        .transaction-amount {
-          font-size: 1.4rem;
-          font-weight: 700;
-        }
-
-        .transaction-income .transaction-amount {
-          color: var(--support-1);
-        }
-
-        .transaction-expense .transaction-amount {
-          color: var(--accent);
-        }
-
-        /* Budget Progress */
-        .budget-section {
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.18);
-  backdrop-filter: blur(6px);
-  border-radius: var(--radius);
-  margin: 0 5%;
-  padding: 60px 40px;
-  box-shadow: 0 8px 24px rgba(47, 43, 40, 0.06);
-  opacity: 0;
-  transform: translateY(50px);
-  transition: all 0.8s ease;
-}
-
-        .budget-section.visible {
-          opacity: 1;
-          transform: translateY(0);
-        }
-
-        .budget-grid {
-          display: grid;
-          grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-          gap: 30px;
-        }
-
-        .budget-item {
-  padding: 25px;
-  border-radius: var(--radius);
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.10);
-  box-shadow: 0 6px 16px rgba(47,43,40,0.04);
-  transition: all 0.3s ease;
-}
-
-
-        .budget-item:hover {
-          transform: translateY(-5px);
-          box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-        }
-
-        .budget-header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 15px;
-        }
-
-        .budget-category {
-          font-weight: 700;
-          color: var(--text);
-          font-size: 1.2rem;
-        }
-
-        .budget-amount {
-          font-weight: 700;
-          color: var(--primary);
-        }
-
-        .progress {
-          height: 12px;
-          border-radius: 6px;
-          background-color: rgba(198, 184, 162, 0.3);
-          margin-bottom: 10px;
-          overflow: hidden;
-        }
-
-        .progress-bar {
-          border-radius: 6px;
-          transition: width 1.5s ease-in-out;
-        }
-
-        .progress-income {
-          background-color: var(--support-1);
-        }
-
-        .progress-expense {
-          background-color: var(--accent);
-        }
-
-        .budget-stats {
-          display: flex;
-          justify-content: space-between;
-          font-size: 0.9rem;
-          color: #6c757d;
-        }
-
-        /* Quick Actions */
-        .actions-section {
-          padding: 80px 5%;
-          text-align: center;
-        }
-
-        .actions-container {
-          max-width: 600px;
-          margin: 0 auto;
-          opacity: 0;
-          transform: translateY(50px);
-          transition: all 0.8s ease;
-          
-        }.actions-container {
-  max-width: 600px;
-  margin: 0 auto;
-  opacity: 0;
-  transform: translateY(50px);
-  transition: all 0.8s ease;
-
-  background: transparent;
-  border: 1px solid rgba(255,255,255,0.14);
-  backdrop-filter: blur(6px);
-  border-radius: var(--radius);
-  padding: 22px;
-}
-
-.summary-item, .transaction-item, .budget-item, .actions-container {
-  padding: 28px;
-}
-.summary-item:hover, .transaction-item:hover, .budget-item:hover, .actions-container:hover {
-  border-color: rgba(123,75,58,0.22); /* tint with your primary */
-  box-shadow: 0 14px 36px rgba(47,43,40,0.08);
-  transform: translateY(-6px);
-}
-
-
-        .actions-container.visible {
-          opacity: 1;
-          transform: translateY(0);
-        }
-
-        .quick-actions {
-          display: flex;
-          gap: 20px;
-          justify-content: center;
-          flex-wrap: wrap;
-        }
-
-        .action-btn {
-          padding: 18px 30px;
-          border-radius: 12px;
-          font-weight: 600;
-          display: flex;
-          align-items: center;
-          gap: 10px;
-          transition: all 0.3s ease;
-          border: none;
-          font-size: 1.1rem;
-          min-width: 200px;
-          justify-content: center;
-        }
-
-        .btn-income {
-          background: var(--support-1);
-          color: white;
-          box-shadow: 0 6px 16px rgba(102, 125, 110, 0.3);
-        }
-
-        .btn-expense {
-          background: var(--accent);
-          color: white;
-          box-shadow: 0 6px 16px rgba(161, 104, 85, 0.3);
-        }
-
-        .action-btn:hover {
-          transform: translateY(-5px) scale(1.05);
-          box-shadow: 0 12px 25px rgba(0, 0, 0, 0.2);
-        }
+       
 
         /* Footer */
         .footer {
@@ -677,7 +406,7 @@
             max-width: 300px;
           }
         }
-.section, .summary-container, .budget-section, .quick-actions {
+.section, .summary-container {
     margin-top: 20px !important;
     padding-top: 10px !important;
 }
@@ -685,10 +414,7 @@
     margin-top: 0 !important;
 }
 .section,
-.summary-container,
-.budget-section,
-.quick-actions,
-.recent-transactions,
+.summary-container
 .card,
 .container,
 .wrapper {
@@ -703,23 +429,13 @@ body {
 }
 /* Reduce section spacing */
 .section,
-.summary-container,
-.budget-section,
-.quick-actions,
-.recent-transactions {
+.summary-container{
     margin-top: 20px !important;
     padding-top: 10px !important;
 }
 
-/* Pull recent transactions closer to the previous section */
-.recent-transactions {
-    margin-top: 0px !important;
-}
 .section,
-.summary-section,
-.budget-section,
-.transactions-section,
-.actions-section {
+.summary-section {
     padding-top: 40px !important;
     padding-bottom: 40px !important;
 }
