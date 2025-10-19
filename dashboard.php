@@ -170,52 +170,43 @@ if ($conn) {
             </div>
         </div>
     </section>
-
-    <!-- Recent Transactions Section -->
-    <section class="section" id="transactions">
+<!-- Transactions Section -->
+<section class="section" id="transactions">
+    <div class="section-header">
         <h2 class="section-title">Recent Transactions</h2>
-        <div class="transactions-section fade-in">
-            <?php
-            // Get recent transactions
-            $transactions_sql = "SELECT * FROM transactions WHERE user_id = ? ORDER BY date DESC LIMIT 5";
-            $transactions_stmt = $conn->prepare($transactions_sql);
-            if ($transactions_stmt) {
-                $transactions_stmt->bind_param("i", $user_id);
-                $transactions_stmt->execute();
-                $transactions_result = $transactions_stmt->get_result();
-                
-                if ($transactions_result->num_rows > 0): ?>
-                    <div class="transactions-list">
-                        <?php while($transaction = $transactions_result->fetch_assoc()): ?>
-                            <div class="transaction-item">
-                                <div class="transaction-info">
-                                    <div class="transaction-desc"><?= htmlspecialchars($transaction['description']) ?></div>
-                                    <div class="transaction-category"><?= htmlspecialchars($transaction['category']) ?></div>
-                                    <div class="transaction-date"><?= date('M j, Y', strtotime($transaction['date'])) ?></div>
-                                </div>
-                                <div class="transaction-amount <?= $transaction['type'] ?>">
-                                    <?= $transaction['type'] == 'income' ? '+' : '-' ?>$<?= number_format($transaction['amount'], 2) ?>
-                                </div>
-                            </div>
-                        <?php endwhile; ?>
-                    </div>
-                <?php else: ?>
-                    <div class="no-transactions">
-                        <p>No transactions yet. <a href="#" id="add-first-transaction">Add your first transaction!</a></p>
-                    </div>
-                <?php endif;
-                $transactions_stmt->close();
-            } else {
-                echo '<div class="no-transactions"><p>Unable to load transactions.</p></div>';
-            }
-            ?>
-        </div>
-    </section>
+        <p class="section-description">Your latest income and expense records</p>
+        <a href="transactions.php" class="btn btn-outline">View All Transactions</a>
+    </div>
+    <div class="transactions-list">
+        <!-- Transaction items will go here -->
+    </div>
+</section>
+
+<!-- Budgets Section -->
+<section class="section" id="budgets">
+    <div class="section-header">
+        <h2 class="section-title">Your Budgets</h2>
+        <p class="section-description">Track your spending against budget limits</p>
+        <a href="budgets.php" class="btn btn-outline">Manage Budgets</a>
+    </div>
+    <div class="budgets-list">
+        <!-- Budget progress bars will go here -->
+    </div>
+</section>
     <style>
     #summary {
-        margin-top: 0px !important;
+        margin-top: -0px !important;
         transform: translateY(-50px);
     }
+    .section-header {
+    text-align: center;
+    margin-bottom: 2rem;
+}
+
+.section-description {
+    color: #666;
+    margin-bottom: 1rem;
+}
 </style>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
