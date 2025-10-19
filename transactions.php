@@ -225,7 +225,6 @@ $currentPage = 'transactions';
                                 <label class="btn btn-outline-danger" for="modalTypeExpense"><i class="fas fa-minus me-1"></i> Expense</label>
                             </div>
                         </div>
-
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label for="modalAmount" class="form-label">Amount</label>
@@ -239,7 +238,6 @@ $currentPage = 'transactions';
                                 <input type="date" class="form-control" id="modalDate" name="date" required>
                             </div>
                         </div>
-
                         <div class="mb-3">
                             <label for="modalCategory" class="form-label">Category</label>
                             <select id="modalCategory" name="category_id" class.form-select" required>
@@ -249,7 +247,6 @@ $currentPage = 'transactions';
                                 <option value="3">Utilities</option>
                             </select>
                         </div>
-                        
                         <div class="mb-3">
                             <label for="modalDescription" class="form-label">Description</label>
                             <textarea id="modalDescription" name="description" class="form-control" rows="3"></textarea>
