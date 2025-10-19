@@ -1,0 +1,434 @@
+ /* Google Fonts (from your login example) */
+
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@600;700;800&display=swap");
+
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
+
+
+
+/* Color Palette from your login page theme */
+
+:root {
+
+  --primary: #7b4b3a;
+
+  --secondary: #c6b8a2;
+
+  --accent: #a16855;
+
+  --neutral-light: #f3f0ec;
+
+  --support-1: #667d6e; /* Green-ish color, for income */
+
+  --danger: #d9534f;   /* A complementary red for delete/warnings */
+
+  --text: #2f2b28;
+
+  --radius: 16px;
+
+  --shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+
+}
+
+
+
+/* --- Base & Typography --- */
+
+body {
+
+  font-family: "Open Sans", sans-serif;
+
+  color: var(--text);
+
+  background: var(--neutral-light); /* Fallback solid color */
+
+  /* Replicating the gradient from your login page */
+
+  background: radial-gradient(
+
+      1200px 600px at -10% -10%,
+
+      rgba(123, 75, 58, 0.05),
+
+      transparent 60%
+
+    ),
+
+    radial-gradient(
+
+      900px 700px at 110% 110%,
+
+      rgba(102, 125, 110, 0.05),
+
+      transparent 60%
+
+    ),
+
+    linear-gradient(135deg, var(--neutral-light), #e6e2dd);
+
+}
+
+
+
+h1, h2, h3, h4, h5, h6, .sidebar .brand, .btn, .form-label {
+
+  font-family: "Poppins", sans-serif;
+
+}
+
+
+
+/* --- Main Layout --- */
+
+.page-wrapper {
+
+  display: flex;
+
+  min-height: 100vh;
+
+}
+
+
+
+.sidebar {
+
+  width: 260px;
+
+  background-color: var(--primary);
+
+  color: #fff;
+
+  padding: 24px;
+
+  display: flex;
+
+  flex-direction: column;
+
+  border-right: 1px solid rgba(0,0,0,0.1);
+
+}
+
+.sidebar .brand {
+
+  font-size: 1.75rem;
+
+  font-weight: 700;
+
+  margin-bottom: 2rem;
+
+  color: #fff;
+
+}
+
+.sidebar .nav-link {
+
+  color: rgba(255, 255, 255, 0.7);
+
+  font-weight: 600;
+
+  padding: 12px 16px;
+
+  border-radius: 8px;
+
+  margin-bottom: 4px;
+
+  transition: background-color 0.2s ease, color 0.2s ease;
+
+}
+
+.sidebar .nav-link:hover {
+
+  background-color: rgba(255, 255, 255, 0.1);
+
+  color: #fff;
+
+}
+
+.sidebar .nav-link.active {
+
+  background-color: var(--accent);
+
+  color: #fff;
+
+  font-weight: 700;
+
+}
+
+
+
+.main-content {
+
+  flex-grow: 1;
+
+  padding: clamp(24px, 3vw, 40px);
+
+}
+
+
+
+.main-content h1 {
+
+    color: var(--primary);
+
+}
+
+
+
+/* --- Components Styling --- */
+
+/* Card style now matches your login page card */
+
+.card {
+
+  width: 100%;
+
+  background: rgba(255, 255, 255, 0.88);
+
+  backdrop-filter: blur(6px);
+
+  -webkit-backdrop-filter: blur(6px);
+
+  border: 1px solid rgba(198, 184, 162, 0.55);
+
+  border-radius: var(--radius);
+
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+
+}
+
+
+
+.form-label {
+
+  font-weight: 600;
+
+  color: var(--primary);
+
+}
+
+.form-control, .form-select {
+
+  padding: 10px 14px;
+
+  border-radius: 10px;
+
+  border: 1px solid var(--secondary);
+
+  background: #fff;
+
+  transition: all 0.25s ease;
+
+}
+
+.form-control:focus, .form-select:focus {
+
+  border-color: var(--accent);
+
+  box-shadow: 0 0 0 0.25rem rgba(161, 104, 85, 0.25);
+
+}
+
+
+
+/* --- Button System --- */
+
+.btn {
+
+  border-radius: 10px;
+
+  font-weight: 600;
+
+  padding: 10px 18px;
+
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+
+}
+
+.btn:hover {
+
+  transform: translateY(-2px);
+
+}
+
+
+
+.btn-primary-custom {
+
+  background-color: var(--primary);
+
+  border-color: var(--primary);
+
+  color: #fff;
+
+  box-shadow: 0 6px 16px rgba(123, 75, 58, 0.22);
+
+}
+
+.btn-primary-custom:hover {
+
+  background-color: #5c382b;
+
+  border-color: #5c382b;
+
+  color: #fff;
+
+  box-shadow: 0 10px 20px rgba(123, 75, 58, 0.28);
+
+}
+
+
+
+.btn-secondary {
+
+  background-color: var(--support-1);
+
+  border-color: var(--support-1);
+
+  color: #fff;
+
+  box-shadow: 0 6px 16px rgba(102, 125, 110, 0.18);
+
+}
+
+.btn-secondary:hover {
+
+  background-color: #4a5c51;
+
+  border-color: #4a5c51;
+
+  color: #fff;
+
+  box-shadow: 0 10px 20px rgba(102, 125, 110, 0.26);
+
+}
+
+
+
+.btn-outline-secondary {
+
+  color: var(--accent);
+
+  border-color: var(--accent);
+
+}
+
+.btn-outline-secondary:hover {
+
+  color: #fff;
+
+  background-color: var(--accent);
+
+  border-color: var(--accent);
+
+}
+
+
+
+.btn-outline-danger {
+
+  color: var(--danger);
+
+  border-color: var(--danger);
+
+}
+
+.btn-outline-danger:hover {
+
+  color: #fff;
+
+  background-color: var(--danger);
+
+  border-color: var(--danger);
+
+}
+
+
+
+/* --- Table Styling --- */
+
+.card .table {
+
+  margin-bottom: 0;
+
+}
+
+.card .table thead th {
+
+  font-family: "Poppins", sans-serif;
+
+  font-weight: 600;
+
+  color: var(--primary);
+
+  background-color: transparent;
+
+  border-bottom: 2px solid var(--secondary);
+
+}
+
+.card .table tbody tr {
+
+  border-bottom: 1px solid var(--neutral-light);
+
+}
+
+.card .table tbody td {
+
+  color: var(--text);
+
+}
+
+.card .table tbody tr:last-child {
+
+  border-bottom: none;
+
+}
+
+.card .table tbody tr:hover {
+
+  background-color: rgba(123, 75, 58, 0.03);
+
+}
+
+
+
+/* --- Color & Alert Utilities --- */
+
+.text-income {
+
+  color: var(--support-1);
+
+}
+
+.text-expense {
+
+  color: var(--danger);
+
+}
+
+.mono-number {
+
+  font-family: 'Roboto Mono', monospace;
+
+}
+
+.alert-success {
+
+    background-color: rgba(102, 125, 110, 0.15);
+
+    border-color: rgba(102, 125, 110, 0.3);
+
+    color: var(--support-1);
+
+}
+
+.alert-danger {
+
+    background-color: rgba(217, 83, 79, 0.1);
+
+    border-color: rgba(217, 83, 79, 0.2);
+
+    color: var(--danger);
+
+}
+

@@ -1,0 +1,231 @@
+/* Google Fonts (from your login example) */
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600&family=Poppins:wght@600;700;800&display=swap");
+@import url('https://fonts.googleapis.com/css2?family=Roboto+Mono&display=swap');
+
+/* Color Palette from your login page theme */
+:root {
+    --primary: #7b4b3a;
+    --secondary: #c6b8a2;
+    --accent: #a16855;
+    --neutral-light: #f3f0ec;
+    --support-1: #667d6e; /* Green-ish color, for success/income */
+    --warning: #f0ad4e;   /* A standard warning yellow */
+    --danger: #d9534f;    /* A complementary red for delete/warnings */
+    --text: #2f2b28;
+    --radius: 16px;
+    --shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+}
+
+/* --- Base & Typography --- */
+body {
+    font-family: "Open Sans", sans-serif;
+    color: var(--text);
+    background: var(--neutral-light); /* Fallback solid color */
+    /* Replicating the gradient from your login page */
+    background: radial-gradient(
+        1200px 600px at -10% -10%,
+        rgba(123, 75, 58, 0.05),
+        transparent 60%
+    ),
+    radial-gradient(
+        900px 700px at 110% 110%,
+        rgba(102, 125, 110, 0.05),
+        transparent 60%
+    ),
+    linear-gradient(135deg, var(--neutral-light), #e6e2dd);
+}
+
+h1, h2, h3, h4, h5, h6, .sidebar .brand, .btn, .form-label {
+    font-family: "Poppins", sans-serif;
+    font-weight: 700;
+}
+
+/* --- Main Layout --- */
+.page-wrapper {
+    display: flex;
+    min-height: 100vh;
+}
+
+.sidebar {
+    width: 260px;
+    background-color: var(--primary);
+    color: #fff;
+    padding: 24px;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid rgba(0,0,0,0.1);
+}
+.sidebar .brand {
+    font-size: 1.75rem;
+    font-weight: 700;
+    margin-bottom: 2rem;
+    color: #fff;
+}
+.sidebar .brand span {
+    color: var(--secondary); /* Using secondary for the accent */
+}
+.sidebar .nav-link {
+    color: rgba(255, 255, 255, 0.7);
+    font-weight: 600;
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 4px;
+    transition: background-color 0.2s ease, color 0.2s ease;
+}
+.sidebar .nav-link i {
+    margin-right: 12px;
+}
+.sidebar .nav-link:hover {
+    background-color: rgba(255, 255, 255, 0.1);
+    color: #fff;
+}
+.sidebar .nav-link.active {
+    background-color: var(--accent);
+    color: #fff;
+    font-weight: 700;
+}
+
+.main-content {
+    flex-grow: 1;
+    padding: clamp(24px, 3vw, 40px);
+}
+
+.main-content h1 {
+    color: var(--primary);
+}
+
+/* --- Components Styling --- */
+/* Card style now matches your login page card */
+.card {
+    width: 100%;
+    background: rgba(255, 255, 255, 0.88);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    border: 1px solid rgba(198, 184, 162, 0.55);
+    border-radius: var(--radius);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.form-label {
+    font-weight: 600;
+    color: var(--primary);
+}
+.form-control, .form-select {
+    padding: 10px 14px;
+    border-radius: 10px;
+    border: 1px solid var(--secondary);
+    background: #fff;
+    transition: all 0.25s ease;
+}
+.form-control:focus, .form-select:focus {
+    border-color: var(--accent);
+    box-shadow: 0 0 0 0.25rem rgba(161, 104, 85, 0.25);
+}
+
+/* --- Button System --- */
+.btn {
+    border-radius: 10px;
+    font-weight: 600;
+    padding: 10px 18px;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background-color 0.2s ease;
+}
+.btn:hover {
+    transform: translateY(-2px);
+}
+.btn-sm {
+    padding: 5px 10px;
+    font-size: 0.875rem;
+    border-radius: 6px;
+}
+
+.btn-secondary {
+    background-color: var(--primary);
+    border-color: var(--primary);
+    color: #fff;
+    box-shadow: 0 6px 16px rgba(123, 75, 58, 0.22);
+}
+.btn-secondary:hover {
+    background-color: #5c382b;
+    border-color: #5c382b;
+    color: #fff;
+    box-shadow: 0 10px 20px rgba(123, 75, 58, 0.28);
+}
+
+.btn-outline-secondary {
+    color: var(--accent);
+    border-color: var(--accent);
+}
+.btn-outline-secondary:hover {
+    color: #fff;
+    background-color: var(--accent);
+    border-color: var(--accent);
+}
+
+.modal-footer .btn-danger {
+    background-color: var(--danger);
+    border-color: var(--danger);
+    color: #fff;
+}
+
+/* Action button styles for the table */
+.btn-outline-success {
+    color: var(--support-1);
+    border-color: var(--support-1);
+}
+.btn-outline-success:hover {
+    color: #fff;
+    background-color: var(--support-1);
+}
+.btn-outline-warning {
+    color: var(--warning);
+    border-color: var(--warning);
+}
+.btn-outline-warning:hover {
+    color: #fff;
+    background-color: var(--warning);
+}
+.btn-outline-danger {
+    color: var(--danger);
+    border-color: var(--danger);
+}
+.btn-outline-danger:hover {
+    color: #fff;
+    background-color: var(--danger);
+}
+
+/* --- Table Styling --- */
+.card .table {
+    margin-bottom: 0;
+}
+.table thead th {
+    font-family: "Poppins", sans-serif;
+    font-weight: 600;
+    color: var(--primary);
+    background-color: transparent;
+    border-bottom: 2px solid var(--secondary);
+}
+.table tbody td {
+    color: var(--text);
+    border-top: 1px solid #e6e2dd;
+}
+.table tbody tr:hover {
+    background-color: rgba(123, 75, 58, 0.03);
+}
+
+/* --- Alert Utilities --- */
+.alert-success {
+    background-color: rgba(102, 125, 110, 0.15);
+    border-color: rgba(102, 125, 110, 0.3);
+    color: var(--support-1);
+}
+.alert-danger {
+    background-color: rgba(217, 83, 79, 0.1);
+    border-color: rgba(217, 83, 79, 0.2);
+    color: var(--danger);
+}
+.alert-info {
+    background-color: rgba(198, 184, 162, 0.2);
+    border-color: rgba(198, 184, 162, 0.4);
+    color: var(--accent);
+}
+
