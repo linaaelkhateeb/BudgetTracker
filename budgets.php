@@ -1,112 +1,118 @@
+<?php
+// Connect to database
+$host = "localhost";
+$user = "root";
+$pass = "";
+$db = "budget_db"; // change to your DB name
+$conn = mysqli_connect($host, $user, $pass, $db);
+
+// Handle add income
+if (isset($_POST['add_income'])) {
+    $amount = $_POST['amount'];
+    $category = $_POST['category'];
+    $type = 'income';
+    $query = "INSERT INTO budget (amount, category, type) VALUES ('$amount', '$category', '$type')";
+    mysqli_query($conn, $query);
+}
+
+// Handle add expense
+if (isset($_POST['add_expense'])) {
+    $amount = $_POST['amount'];
+    $category = $_POST['category'];
+    $type = 'expense';
+    $query = "INSERT INTO budget (amount, category, type) VALUES ('$amount', '$category', '$type')";
+    mysqli_query($conn, $query);
+}
+
+// Totals
+$total_income = mysqli_fetch_assoc(mysqli_query($conn, "SELECT SUM(amount) AS total FROM budget WHERE type='income'"))['total'] ?? 0;
+$total_expense = mysqli_fetch_assoc(mysqli_query($conn, "SELECT SUM(amount) AS total FROM budget WHERE type='expense'"))['total'] ?? 0;
+$balance = $total_income - $total_expense;
+
+// Get all records
+$result = mysqli_query($conn, "SELECT * FROM budget ORDER BY id DESC");
+?>
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Budgets - BudgetWise</title>
-    <link rel="stylesheet" href="css/style1.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>My Budget</title>
+  <link rel="stylesheet" href="style1.css">
 </head>
 <body>
-    <!-- Header -->
-    <header class="header">
-        <div class="header-content">
-            <a href="#" class="logo">BudgetWise</a>
-            <div class="user-menu">
-                <span>Welcome, User!</span>
-                <button class="btn" style="background:#3498db; color:white;">Logout</button>
-            </div>
+  <div class="auth-wrap">
+    <!-- Left hero -->
+    <div class="auth-hero">
+      <h1>Smart Budget Tracker</h1>
+      <p>Manage your income and expenses effortlessly. Track your financial balance and stay in control!</p>
+      <div class="hero-cards">
+        <div class="hero-card">
+          <h6>Total Income</h6>
+          <p>💰 <?php echo number_format($total_income, 2); ?> EGP</p>
         </div>
-    </header>
-
-    <!-- Main Layout -->
-    <div class="app-container">
-        <!-- Sidebar -->
-        <nav class="sidebar">
-            <ul class="sidebar-nav">
-                <li><a href="#">📊 Dashboard</a></li>
-                <li><a href="#">💳 Transactions</a></li>
-                <li><a href="#" class="active">💰 Budgets</a></li>
-                <li><a href="#">📈 Reports</a></li>
-                <li><a href="#">⚙️ Settings</a></li>
-            </ul>
-        </nav>
-
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Page Header -->
-            <div class="page-header">
-                <h1 class="page-title">My Budgets</h1>
-                <button class="btn btn-success" onclick="openModal()">
-                    ＋ Create New Budget
-                </button>
-            </div>
-
-            <!-- Budgets Grid -->
-            <div class="budgets-grid">
-                <!-- Budget Card 1 -->
-                <div class="budget-card">
-                    <div class="budget-header">
-                        <h3 class="budget-category">Groceries</h3>
-                        <span class="budget-amount">$400 / $500</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 80%"></div>
-                    </div>
-                    <div class="budget-details">
-                        <span>Spent: $400</span>
-                        <span>Remaining: $100</span>
-                    </div>
-                    <div class="budget-actions">
-                        <button class="btn" style="background:#3498db; color:white;">Edit</button>
-                        <button class="btn" style="background:#e74c3c; color:white;">Delete</button>
-                    </div>
-                </div>
-
-                <!-- Budget Card 2 -->
-                <div class="budget-card">
-                    <div class="budget-header">
-                        <h3 class="budget-category">Entertainment</h3>
-                        <span class="budget-amount">$150 / $200</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 75%"></div>
-                    </div>
-                    <div class="budget-details">
-                        <span>Spent: $150</span>
-                        <span>Remaining: $50</span>
-                    </div>
-                    <div class="budget-actions">
-                        <button class="btn" style="background:#3498db; color:white;">Edit</button>
-                        <button class="btn" style="background:#e74c3c; color:white;">Delete</button>
-                    </div>
-                </div>
-
-                <!-- Budget Card 3 -->
-                <div class="budget-card">
-                    <div class="budget-header">
-                        <h3 class="budget-category">Transportation</h3>
-                        <span class="budget-amount">$250 / $200</span>
-                    </div>
-                    <div class="progress-bar">
-                        <div class="progress-fill" style="width: 125%; background:#e74c3c"></div>
-                    </div>
-                    <div class="budget-details">
-                        <span>Spent: $250</span>
-                        <span style="color:#e74c3c">Over: $50</span>
-                    </div>
-                    <div class="budget-actions">
-                        <button class="btn" style="background:#3498db; color:white;">Edit</button>
-                        <button class="btn" style="background:#e74c3c; color:white;">Delete</button>
-                    </div>
-                </div>
-            </div>
-        </main>
+        <div class="hero-card">
+          <h6>Total Expenses</h6>
+          <p>💸 <?php echo number_format($total_expense, 2); ?> EGP</p>
+        </div>
+        <div class="hero-card">
+          <h6>Balance</h6>
+          <p>⚖️ <?php echo number_format($balance, 2); ?> EGP</p>
+        </div>
+      </div>
     </div>
 
-    <script>
-        function openModal() {
-            alert('Create New Budget button clicked!');
-        }
-    </script>
+    <!-- Right Panel -->
+    <div class="auth-panel">
+      <div class="auth-card">
+        <h2>Manage Your Budget</h2>
+
+        <form method="post">
+          <label class="form-label">Amount</label><br>
+          <input type="number" name="amount" class="form-control" required><br>
+
+          <label class="form-label">Category</label><br>
+          <select name="category" class="form-control" required>
+            <option value="Salary">Salary</option>
+            <option value="Groceries">Groceries</option>
+            <option value="Bills">Bills</option>
+            <option value="Transportation">Transportation</option>
+            <option value="Shopping">Shopping</option>
+            <option value="Other">Other</option>
+          </select><br>
+
+          <div class="btns">
+            <button type="submit" name="add_income" class="btn btn-primary">+ Add Income</button>
+            <button type="submit" name="add_expense" class="btn btn-success">− Add Expense</button>
+          </div>
+        </form>
+
+        <div class="divider"><span>Recent Transactions</span></div>
+        <table class="table">
+          <tr>
+            <th>Type</th>
+            <th>Category</th>
+            <th>Amount (EGP)</th>
+          </tr>
+          <?php while ($row = mysqli_fetch_assoc($result)): ?>
+          <tr>
+            <td><?php echo ucfirst($row['type']); ?></td>
+            <td><?php echo $row['category']; ?></td>
+            <td><?php echo number_format($row['amount'], 2); ?></td>
+          </tr>
+          <?php endwhile; ?>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- Smooth page motion -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      document.body.style.opacity = '1';
+      document.body.style.transform = 'translateY(0)';
+    });
+  </script>
 </body>
 </html>
