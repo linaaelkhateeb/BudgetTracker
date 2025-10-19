@@ -29,8 +29,10 @@ unset($_SESSION['form_errors'], $_SESSION['form_old']);
       </div>
 
       <h1 class="parallax">Track Your Finances Peacefully</h1>
-      <p>Organize your income, control expenses, and enjoy clarity with <strong>BudgetTracker</strong>.</p>
-
+      <p class="parallax">
+      Organize your income, control expenses, and enjoy clarity with
+      <strong>BudgetTracker</strong>.
+      </p>
       <div class="hero-cards">
         <div class="hero-card"><h6>Income Logged</h6><div>+12.3% this month</div></div>
         <div class="hero-card"><h6>Balance</h6><div>AED 2,940</div></div>
