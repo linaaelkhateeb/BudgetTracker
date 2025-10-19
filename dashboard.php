@@ -1,3 +1,68 @@
+<?php
+// dashboard.php
+require_once 'includes/database.php';
+session_start();
+
+// Temporary mock session for development - REMOVE LATER
+if (!isset($_SESSION['user_id'])) {
+    $_SESSION['user_id'] = 1;
+    $_SESSION['user_name'] = 'John Doe';
+}
+
+$user_id = $_SESSION['user_id'];
+
+// Initialize variables with default values
+$user_name = $_SESSION['user_name'] ?? 'User';
+$total_income = 4250.00;
+$total_expenses = 2840.00;
+$balance = $total_income - $total_expenses;
+
+// Safely get user data from database
+if ($conn) {
+    // Check if users table exists and get user data
+    $user_sql = "SELECT name FROM users WHERE id = ?";
+    $user_stmt = $conn->prepare($user_sql);
+    
+    if ($user_stmt) {
+        $user_stmt->bind_param("i", $user_id);
+        $user_stmt->execute();
+        $user_result = $user_stmt->get_result();
+        if ($user_data = $user_result->fetch_assoc()) {
+            $user_name = $user_data['name'];
+        }
+        $user_stmt->close();
+    }
+    
+    // Try to get summary data if transactions table exists
+    $summary_sql = "SHOW TABLES LIKE 'transactions'";
+    $table_result = $conn->query($summary_sql);
+    
+    if ($table_result->num_rows > 0) {
+        $summary_sql = "
+            SELECT 
+                COALESCE(SUM(CASE WHEN type = 'income' THEN amount ELSE 0 END), 0) as total_income,
+                COALESCE(SUM(CASE WHEN type = 'expense' THEN amount ELSE 0 END), 0) as total_expenses
+            FROM transactions 
+            WHERE user_id = ? 
+            AND MONTH(date) = MONTH(CURRENT_DATE()) 
+            AND YEAR(date) = YEAR(CURRENT_DATE())
+        ";
+        $summary_stmt = $conn->prepare($summary_sql);
+        
+        if ($summary_stmt) {
+            $summary_stmt->bind_param("i", $user_id);
+            $summary_stmt->execute();
+            $summary_result = $summary_stmt->get_result();
+            if ($summary_data = $summary_result->fetch_assoc()) {
+                $total_income = $summary_data['total_income'] ?: 4250.00;
+                $total_expenses = $summary_data['total_expenses'] ?: 2840.00;
+                $balance = $total_income - $total_expenses;
+            }
+            $summary_stmt->close();
+        }
+    }
+}
+?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -7,6 +72,14 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <link rel="stylesheet" href="CSS/dashboard.css">
+    <style>
+        .section {
+            margin-bottom: 3rem;
+        }
+        .summary-section {
+            margin-top: 2rem;
+        }
+    </style>
 </head>
 <body>
     <!-- Navigation -->
@@ -36,6 +109,16 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#actions">Quick Actions</a>
                     </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                            <i class="fas fa-user"></i> <?= htmlspecialchars($user_name) ?>
+                        </a>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
+                            <li><hr class="dropdown-divider"></li>
+                            <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                        </ul>
+                    </li>
                 </ul>
             </div>
         </div>
@@ -44,16 +127,16 @@
     <!-- Hero Section -->
     <section class="hero" id="home">
         <div class="hero-content">
-            <h1>Take Control of Your Finances</h1>
-            <p>Budget Planner helps you track income, manage expenses, and achieve your financial goals with ease and precision.</p>
+            <h1>Welcome back, <?= htmlspecialchars($user_name) ?>!</h1>
+            <p>Take Control of Your Finances. Track income, manage expenses, and achieve your financial goals with ease and precision.</p>
             <div class="hero-buttons">
-                <button class="btn btn-primary" id="get-started">Get Started</button>
-                <button class="btn btn-outline">Learn More</button>
+                <button class="btn btn-primary" id="get-started">Add Transaction</button>
+                <button class="btn btn-outline">View Reports</button>
             </div>
         </div>
     </section>
 
-    <!-- Monthly Summary -->
+    <!-- Monthly Summary - MOVED RIGHT AFTER HERO -->
     <section class="section" id="summary">
         <h2 class="section-title">Monthly Summary</h2>
         <div class="summary-section fade-in">
@@ -63,7 +146,7 @@
                         <i class="fas fa-arrow-down"></i>
                     </div>
                     <h3>Total Income</h3>
-                    <div class="summary-amount" id="total-income">$4,250.00</div>
+                    <div class="summary-amount" id="total-income">$<?= number_format($total_income, 2) ?></div>
                     <p>This Month</p>
                 </div>
                 <div class="summary-item expenses">
@@ -71,7 +154,7 @@
                         <i class="fas fa-arrow-up"></i>
                     </div>
                     <h3>Total Expenses</h3>
-                    <div class="summary-amount" id="total-expenses">$2,840.00</div>
+                    <div class="summary-amount" id="total-expenses">$<?= number_format($total_expenses, 2) ?></div>
                     <p>This Month</p>
                 </div>
                 <div class="summary-item balance">
@@ -79,12 +162,63 @@
                         <i class="fas fa-wallet"></i>
                     </div>
                     <h3>Balance</h3>
-                    <div class="summary-amount" id="balance">$1,410.00</div>
+                    <div class="summary-amount" id="balance" style="color: <?= $balance >= 0 ? '#2ecc71' : '#e74c3c' ?>">
+                        $<?= number_format($balance, 2) ?>
+                    </div>
                     <p>This Month</p>
                 </div>
             </div>
         </div>
     </section>
-<script src="js/dashboard.js"></script>
+
+    <!-- Recent Transactions Section -->
+    <section class="section" id="transactions">
+        <h2 class="section-title">Recent Transactions</h2>
+        <div class="transactions-section fade-in">
+            <?php
+            // Get recent transactions
+            $transactions_sql = "SELECT * FROM transactions WHERE user_id = ? ORDER BY date DESC LIMIT 5";
+            $transactions_stmt = $conn->prepare($transactions_sql);
+            if ($transactions_stmt) {
+                $transactions_stmt->bind_param("i", $user_id);
+                $transactions_stmt->execute();
+                $transactions_result = $transactions_stmt->get_result();
+                
+                if ($transactions_result->num_rows > 0): ?>
+                    <div class="transactions-list">
+                        <?php while($transaction = $transactions_result->fetch_assoc()): ?>
+                            <div class="transaction-item">
+                                <div class="transaction-info">
+                                    <div class="transaction-desc"><?= htmlspecialchars($transaction['description']) ?></div>
+                                    <div class="transaction-category"><?= htmlspecialchars($transaction['category']) ?></div>
+                                    <div class="transaction-date"><?= date('M j, Y', strtotime($transaction['date'])) ?></div>
+                                </div>
+                                <div class="transaction-amount <?= $transaction['type'] ?>">
+                                    <?= $transaction['type'] == 'income' ? '+' : '-' ?>$<?= number_format($transaction['amount'], 2) ?>
+                                </div>
+                            </div>
+                        <?php endwhile; ?>
+                    </div>
+                <?php else: ?>
+                    <div class="no-transactions">
+                        <p>No transactions yet. <a href="#" id="add-first-transaction">Add your first transaction!</a></p>
+                    </div>
+                <?php endif;
+                $transactions_stmt->close();
+            } else {
+                echo '<div class="no-transactions"><p>Unable to load transactions.</p></div>';
+            }
+            ?>
+        </div>
+    </section>
+    <style>
+    #summary {
+        margin-top: 0px !important;
+        transform: translateY(-50px);
+    }
+</style>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="js/dashboard.js"></script>
 </body>
 </html>
