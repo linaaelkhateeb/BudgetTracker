@@ -1,0 +1,342 @@
+/* budgets.css
+   Styles tailored to match the provided screenshot: warm beige hero area on the left,
+   a card-based right panel, rounded corners, subtle shadows, and bold header typography.
+   Applies to the budgets.php structure (page-wrapper, sidebar, main-content, cards, modals).
+*/
+
+/* Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800&family=Open+Sans:wght@300;400;600&family=Roboto+Mono:wght@400;700&display=swap');
+
+:root{
+  /* Color palette tuned to the screenshot */
+  --bg-left-1: #d5c9bd;   /* warm beige start */
+  --bg-left-2: #e6dcca;   /* warm beige end */
+  --panel-bg: #fbf8f6;    /* off-white panel */
+  --accent-brown: #7b3f34;/* headings, primary brown */
+  --muted-green: #6b8b7a; /* secondary / create button */
+  --card-white: #ffffff;
+  --card-shadow: 0 12px 30px rgba(36,30,25,0.08);
+  --soft-shadow: 0 8px 20px rgba(36,30,25,0.06);
+  --input-border: #e8bcbc; /* pinkish border on inputs */
+  --text: #44352f;
+  --muted-text: #6b5b52;
+  --radius-lg: 14px;
+  --radius-md: 10px;
+  --radius-sm: 8px;
+}
+
+/* Page layout */
+html,body{
+  height: 100%;
+  margin: 0;
+  font-family: 'Open Sans', sans-serif;
+  color: var(--text);
+  background: linear-gradient(90deg, var(--bg-left-1) 0%, var(--bg-left-2) 45%, #f6f4f2 45%);
+  -webkit-font-smoothing:antialiased;
+  -moz-osx-font-smoothing:grayscale;
+}
+
+/* wrapper holds left hero/sidebar and right main panel */
+.page-wrapper{
+  min-height: 100vh;
+  display: flex;
+  gap: 0;
+}
+
+/* LEFT AREA (hero) */
+.sidebar{
+  width: 56%;
+  padding: 68px 72px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: flex-start;
+  position: relative;
+  overflow: hidden;
+}
+
+/* Brand badge */
+.brand{
+  display: inline-flex;
+  align-items: center;
+  gap: 14px;
+  font-weight: 700;
+  color: var(--muted-green);
+  font-family: 'Montserrat', sans-serif;
+  font-size: 20px;
+}
+.brand::before{
+  content: "BT";
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 44px;
+  height: 44px;
+  background: var(--accent-brown);
+  color: #fff;
+  border-radius: 10px;
+  font-weight: 700;
+  box-shadow: var(--soft-shadow);
+  font-family: 'Montserrat', sans-serif;
+}
+
+/* Hero heading */
+.sidebar h1, .sidebar .hero-title {
+  margin: 28px 0 12px 0;
+  font-size: clamp(34px, 5.2vw, 64px);
+  line-height: 1.02;
+  color: var(--accent-brown);
+  font-family: 'Montserrat', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.6px;
+}
+
+/* Subheading / description */
+.sidebar p.lead {
+  margin: 12px 0 32px 0;
+  font-size: 18px;
+  color: var(--muted-text);
+  max-width: 640px;
+  font-weight: 400;
+}
+
+/* Small stat cards under hero (three cards) */
+.sidebar .hero-stats {
+  display: flex;
+  gap: 28px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
+.sidebar .hero-stats .stat-card {
+  background: var(--card-white);
+  padding: 20px 28px;
+  border-radius: var(--radius-lg);
+  box-shadow: var(--card-shadow);
+  min-width: 220px;
+  flex: 0 1 260px;
+}
+.sidebar .stat-card .stat-title {
+  font-weight: 700;
+  color: var(--accent-brown);
+  font-family: 'Montserrat', sans-serif;
+  margin-bottom: 6px;
+}
+.sidebar .stat-card .stat-value {
+  font-weight: 600;
+  color: var(--muted-text);
+}
+
+/* RIGHT AREA (main content panel) */
+.main-content{
+  width: 44%;
+  padding: 44px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  background: transparent;
+}
+
+/* card look for main panel (simulate floating right card) */
+.main-content > .card, .card {
+  background: var(--panel-bg);
+  border: none;
+  border-radius: 18px;
+  box-shadow: var(--card-shadow);
+}
+
+/* Title area in right panel */
+.main-content h1 {
+  font-family: 'Montserrat', sans-serif;
+  color: var(--accent-brown);
+  font-weight: 800;
+  margin: 0 0 18px 0;
+  font-size: 34px;
+}
+
+/* Alerts container */
+#alertsContainer {
+  margin-bottom: 16px;
+}
+
+/* Controls row (view toggles, create button) */
+.d-flex.align-items-center.mb-4 {
+  gap: 12px;
+}
+
+/* View toggle buttons */
+.btn-outline-secondary {
+  border-radius: 10px;
+  border-color: rgba(0,0,0,0.06);
+  color: var(--muted-text);
+  background: rgba(255,255,255,0.4);
+  box-shadow: none;
+}
+.btn-outline-secondary.active {
+  background: rgba(255,255,255,0.8);
+  color: var(--accent-brown);
+  border-color: rgba(0,0,0,0.08);
+  box-shadow: var(--soft-shadow);
+}
+
+/* Create New Budget button */
+.btn-success {
+  background: linear-gradient(180deg, var(--muted-green), #5f7d6e);
+  border: none;
+  color: #fff;
+  font-weight: 700;
+  border-radius: 12px;
+  padding: 10px 18px;
+  box-shadow: 0 10px 22px rgba(89,117,103,0.12);
+}
+.btn-success .fas { margin-right: 6px; }
+
+/* Filters row */
+.input-group .input-group-text {
+  background: transparent;
+  border: none;
+}
+.form-select, .form-control {
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,0.06);
+  background: #fff;
+  box-shadow: none;
+}
+
+/* Budgets grid/list container - cards style */
+#budgetsContainer .card {
+  border-radius: 12px;
+  overflow: hidden;
+}
+#budgetsContainer .card .card-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+}
+
+/* Card title and metadata */
+.card-title {
+  font-family: 'Montserrat', sans-serif;
+  color: var(--accent-brown);
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.card .text-muted.small {
+  color: var(--muted-text);
+}
+
+/* Progress bar */
+.progress {
+  background: rgba(0,0,0,0.04);
+  height: 12px;
+  border-radius: 8px;
+  overflow: hidden;
+}
+.progress-bar {
+  background: linear-gradient(90deg, rgba(123,63,52,1), rgba(120,57,46,0.95));
+  height: 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  box-shadow: 0 6px 12px rgba(123,63,52,0.08);
+}
+
+/* Bottom actions in each budget card */
+.card .d-flex.mt-auto {
+  margin-top: 12px;
+}
+.card .btn {
+  border-radius: 8px;
+}
+.btn-outline-primary {
+  border: 1px solid rgba(0,0,0,0.06);
+  background: transparent;
+  color: var(--muted-green);
+}
+.btn-outline-danger {
+  border: 1px solid rgba(0,0,0,0.06);
+  background: transparent;
+  color: #b6453a;
+}
+
+/* mono-number style for amounts */
+.mono-number {
+  font-family: 'Roboto Mono', monospace;
+  font-weight: 700;
+}
+
+/* Modal overrides (Bootstrap default roundedness is increased) */
+.modal-content {
+  border-radius: 14px;
+  background: #fff;
+  overflow: hidden;
+  box-shadow: 0 20px 45px rgba(36,30,25,0.12);
+}
+.modal-header .modal-title {
+  font-family: 'Montserrat', sans-serif;
+  color: var(--accent-brown);
+  font-weight: 800;
+}
+.modal-body .form-label {
+  font-weight: 600;
+  color: var(--muted-green);
+}
+
+/* Inputs inside modal */
+#budgetModal .form-control, #budgetModal .form-select {
+  border-radius: 10px;
+  border: 1px solid var(--input-border);
+  padding: 10px 12px;
+  background: #fff;
+}
+#budgetModal .input-group-text {
+  background: transparent;
+  border: none;
+  color: var(--muted-text);
+}
+
+/* List group for transactions modal */
+#budgetTxList .list-group-item {
+  border: none;
+  border-bottom: 1px dashed rgba(0,0,0,0.03);
+}
+#budgetTxList .fw-bold {
+  color: var(--accent-brown);
+}
+
+/* small helpers */
+.text-muted.small { font-size: 13px; }
+.card small { font-size: 13px; }
+
+/* Responsive: stack the layout on smaller screens */
+@media (max-width: 1000px) {
+  .sidebar, .main-content {
+    width: 100%;
+    padding: 28px;
+  }
+  .page-wrapper {
+    flex-direction: column;
+  }
+  .sidebar h1 {
+    font-size: 36px;
+  }
+  .brand::before { width: 38px; height: 38px; font-size: 14px; }
+  #budgetsContainer { margin-top: 12px; }
+}
+
+/* Small screens - make cards full width */
+@media (max-width: 700px) {
+  .sidebar {
+    padding: 20px;
+    background: linear-gradient(180deg, var(--bg-left-1), var(--bg-left-2));
+  }
+  .hero-stats { flex-direction: column; gap: 14px; }
+  .btn-success { width: 100%; }
+}
