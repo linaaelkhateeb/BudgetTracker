@@ -1,0 +1,412 @@
+/* Google Fonts */
+@import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Poppins:wght@600;700;800&display=swap");
+
+/* Custom properties for motion */
+@property --tx {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --ty {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --floatX {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --floatY {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --scale {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+@property --introY {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --introS {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+@property --hoverY {
+  syntax: "<length>";
+  inherits: false;
+  initial-value: 0px;
+}
+@property --hoverS {
+  syntax: "<number>";
+  inherits: false;
+  initial-value: 1;
+}
+
+/* Palette & base tokens (keeps the look & feel of provided theme) */
+:root {
+  --primary: #7b4b3a;
+  --secondary: #c6b8a2;
+  --accent: #a16855;
+  --neutral-light: #d7d2cc;
+  --support-1: #667d6e;
+  --text: #2f2b28;
+  --radius: 16px;
+  --shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+
+  /* Budget-specific overrides (optional) */
+  --action-blue: #3498db;
+  --income-green: #2ecc71;
+  --expense-red: #e74c3c;
+  --card-bg: rgba(255,255,255,0.88);
+  --muted: rgba(47,43,40,0.6);
+  --glass-border: rgba(198, 184, 162, 0.55);
+}
+
+/* -------------------------
+   Base / Utility
+   ------------------------- */
+* { box-sizing: border-box; }
+html, body { height: 100%; }
+body {
+  font-family: "Open Sans", sans-serif;
+  color: var(--text);
+  background: radial-gradient(
+      1200px 600px at -10% -10%,
+      rgba(123, 75, 58, 0.06),
+      transparent 60%
+    ),
+    radial-gradient(
+      900px 700px at 110% 110%,
+      rgba(102, 125, 110, 0.04),
+      transparent 60%
+    ),
+    linear-gradient(135deg, var(--neutral-light), var(--secondary));
+  margin: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  opacity: 0;
+  animation: fadeInBody 0.6s ease forwards;
+  padding: clamp(18px, 2.5vw, 28px);
+}
+@keyframes fadeInBody {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+/* Typography */
+h1, h2, h3, h4, h5, h6, .brand-title, .btn {
+  font-family: "Poppins", sans-serif;
+}
+p { line-height: 1.55; color: var(--muted); }
+
+/* Links / buttons defaults */
+a { color: inherit; text-decoration: none; }
+button { font-family: inherit; cursor: pointer; }
+
+/* -------------------------
+   Header
+   ------------------------- */
+.header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  max-width: 1200px;
+  margin: 0 auto 22px auto;
+  padding: 12px 18px;
+  border-radius: 12px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.8), rgba(255,255,255,0.72));
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 12px 30px rgba(0,0,0,0.06);
+  backdrop-filter: blur(6px);
+}
+.header h1 {
+  margin: 0;
+  font-size: clamp(1.1rem, 2.4vw, 1.6rem);
+  color: var(--primary);
+  letter-spacing: 0.2px;
+  transform-origin: left center;
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.header .btn {
+  border: none;
+  padding: 10px 14px;
+  border-radius: 10px;
+  font-weight: 700;
+  box-shadow: 0 8px 20px rgba(52, 152, 219, 0.12);
+}
+
+/* Specific action buttons */
+.btn.add-btn {
+  background: linear-gradient(180deg, var(--action-blue), #2b86c7);
+  color: #fff;
+  border: 1px solid rgba(0,0,0,0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.btn.add-btn:hover { transform: translateY(-4px); box-shadow: 0 16px 36px rgba(52,152,219,0.16); }
+
+/* -------------------------
+   Main container & grid
+   ------------------------- */
+.budget-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  display: block;
+}
+.budget-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 18px;
+  margin-top: 18px;
+}
+@media (max-width: 1024px) {
+  .budget-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 640px) {
+  .budget-grid { grid-template-columns: 1fr; }
+}
+
+/* -------------------------
+   Budget Card
+   ------------------------- */
+.budget-card {
+  background: var(--card-bg);
+  border-radius: 14px;
+  border: 1px solid var(--glass-border);
+  padding: 16px;
+  box-shadow: var(--shadow);
+  position: relative;
+  overflow: hidden;
+  transition: transform 0.28s cubic-bezier(.2,.9,.3,1), box-shadow 0.28s ease, opacity 0.3s ease;
+  transform-origin: center;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.budget-card:hover {
+  transform: translateY(-8px) scale(1.01);
+  box-shadow: 0 22px 48px rgba(0,0,0,0.12);
+}
+
+/* Card header */
+.budget-card h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: var(--primary);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.budget-meta {
+  display: flex;
+  gap: 8px;
+  font-size: 0.92rem;
+  color: var(--muted);
+  align-items: center;
+}
+
+/* Money rows */
+.money-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
+  color: var(--support-1);
+}
+.money-row small { font-weight: 400; color: var(--muted); }
+
+/* Remaining highlight */
+.budget-card .remaining {
+  color: var(--text);
+  font-weight: 700;
+}
+
+/* -------------------------
+   Progress bar
+   ------------------------- */
+.progress-bar {
+  width: 100%;
+  height: 12px;
+  background: linear-gradient(180deg, rgba(0,0,0,0.04), rgba(0,0,0,0.02));
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(0,0,0,0.04);
+}
+.progress {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, var(--income-green), #19b35c 60%);
+  border-radius: 999px;
+  transition: width 0.8s cubic-bezier(.2,.9,.3,1);
+  box-shadow: inset 0 -6px 10px rgba(0,0,0,0.06);
+}
+
+/* When >100% show danger color */
+.progress.over {
+  background: linear-gradient(90deg, var(--expense-red), #d14035 60%);
+}
+
+/* -------------------------
+   Action buttons inside card
+   ------------------------- */
+.actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+.actions .btn {
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-weight: 700;
+  border: 1px solid rgba(0,0,0,0.04);
+  background: #fff;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.04);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.actions .btn.edit-btn {
+  color: var(--action-blue);
+  border-color: rgba(52,152,219,0.12);
+}
+.actions .btn.delete-btn {
+  color: var(--expense-red);
+  border-color: rgba(231,76,60,0.08);
+}
+.actions .btn:hover { transform: translateY(-3px); }
+
+/* -------------------------
+   Modal (Add / Edit)
+   ------------------------- */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  background: rgba(20,20,20,0.32);
+  z-index: 1200;
+  opacity: 1;
+  transition: opacity 0.22s ease;
+}
+.modal.hidden { opacity: 0; pointer-events: none; }
+
+/* modal content card */
+.modal-content {
+  width: min(560px, 92vw);
+  background: var(--card-bg);
+  border-radius: 14px;
+  padding: clamp(18px, 2.5vw, 28px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 28px 60px rgba(0,0,0,0.18);
+  transform: translateY(10px);
+  animation: modalIn 0.32s cubic-bezier(.2,.9,.3,1) forwards;
+}
+@keyframes modalIn {
+  from { opacity: 0; transform: translateY(18px) scale(.995); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+.modal-content h2 {
+  margin: 0 0 8px 0;
+  color: var(--primary);
+}
+
+/* close button */
+.modal-content .close {
+  position: absolute;
+  right: 18px;
+  top: 16px;
+  font-size: 20px;
+  background: transparent;
+  border: none;
+  color: var(--muted);
+  cursor: pointer;
+}
+
+/* form controls in modal */
+.modal-content form {
+  display: grid;
+  gap: 12px;
+  margin-top: 10px;
+}
+.modal-content label {
+  font-weight: 700;
+  font-size: 0.88rem;
+  color: var(--support-1);
+}
+.modal-content input[type="text"],
+.modal-content input[type="number"],
+.modal-content select {
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid rgba(198, 184, 162, 0.75);
+  background: #fff;
+  font-size: 0.95rem;
+  transition: all 0.22s ease;
+}
+.modal-content input:focus,
+.modal-content select:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 8px 26px rgba(161,104,85,0.08);
+  transform: translateY(-2px);
+}
+
+/* modal buttons */
+.modal-content .confirm-btn {
+  background: linear-gradient(180deg, var(--income-green), #21b86a);
+  color: #fff;
+  padding: 12px 16px;
+  border: none;
+  border-radius: 10px;
+  font-weight: 800;
+  box-shadow: 0 12px 32px rgba(46, 204, 113, 0.12);
+  transition: transform 0.18s ease, box-shadow 0.18s ease;
+}
+.modal-content .confirm-btn:hover { transform: translateY(-4px); box-shadow: 0 20px 46px rgba(46,204,113,0.14); }
+
+/* -------------------------
+   Small UI helpers
+   ------------------------- */
+.hidden { display: none !important; }
+.small { font-size: 0.86rem; color: var(--muted); }
+.center { text-align: center; }
+
+/* subtle utility shadow for floating elements */
+.floating {
+  box-shadow: 0 12px 36px rgba(0,0,0,0.08);
+}
+
+/* -------------------------
+   JS-driven progress label animation
+   ------------------------- */
+.progress-label {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.86rem;
+  gap: 8px;
+  color: var(--muted);
+  margin-top: 6px;
+}
+
+/* -------------------------
+   Responsive & accessibility
+   ------------------------- */
+@media (prefers-reduced-motion: reduce) {
+  * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
+
+/* keyboard focus states */
+button:focus, input:focus, select:focus {
+  outline: 3px solid rgba(52,152,219,0.14);
+  outline-offset: 3px;
+}
+
+/* final small nicety - animate progress bars on appear via CSS var with JS toggling */
+.budget-card[data-animate="true"] .progress { transition: width 0.9s cubic-bezier(.2,.9,.3,1); }
+
+/* end of file */
