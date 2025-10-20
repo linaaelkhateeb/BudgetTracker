@@ -3,21 +3,35 @@
 require_once 'includes/database.php';
 session_start();
 
-// Temporary mock session for development - REMOVE LATER
-if (!isset($_SESSION['user_id'])) {
-    $_SESSION['user_id'] = 1;
-    $_SESSION['user_name'] = 'John Doe';
+// Initialize auth variables
+$is_logged_in = false;
+$user_id = $_SESSION['user_id'] ?? null;
+$user_name = 'User';
+
+// Verify session against database; only then consider user logged in
+if ($conn && $user_id) {
+    $user_sql = "SELECT name FROM users WHERE id = ?";
+    $user_stmt = $conn->prepare($user_sql);
+    if ($user_stmt) {
+        $user_stmt->bind_param("i", $user_id);
+        $user_stmt->execute();
+        $user_result = $user_stmt->get_result();
+        if ($user_data = $user_result->fetch_assoc()) {
+            $is_logged_in = true;
+            $user_name = $user_data['name'] ?: 'User';
+        } else {
+            // Stale session: clear user-related session vars
+            unset($_SESSION['user_id'], $_SESSION['user_name']);
+        }
+        $user_stmt->close();
+    }
 }
 
-$user_id = $_SESSION['user_id'];
-
-// Initialize variables with default values
-$user_name = $_SESSION['user_name'] ?? 'User';
-// Get REAL financial data from database
+// Get REAL financial data from database (only when logged in)
 $total_income = 0;
 $total_expenses = 0;
 
-if ($conn) {
+if ($conn && $is_logged_in) {
     // Get current month income
     $income_sql = "SELECT COALESCE(SUM(amount), 0) as total FROM transactions 
                    WHERE user_id = ? AND type = 'income' 
@@ -47,22 +61,8 @@ if ($conn) {
     $balance = $total_income - $total_expenses;
 }
 
-// Safely get user data from database
-if ($conn) {
-    // Check if users table exists and get user data
-    $user_sql = "SELECT name FROM users WHERE id = ?";
-    $user_stmt = $conn->prepare($user_sql);
-    
-    if ($user_stmt) {
-        $user_stmt->bind_param("i", $user_id);
-        $user_stmt->execute();
-        $user_result = $user_stmt->get_result();
-        if ($user_data = $user_result->fetch_assoc()) {
-            $user_name = $user_data['name'];
-        }
-        $user_stmt->close();
-    }
-    
+// Safely get summary data if transactions table exists (logged in only)
+if ($conn && $is_logged_in) {
     // Try to get summary data if transactions table exists
     $summary_sql = "SHOW TABLES LIKE 'transactions'";
     $table_result = $conn->query($summary_sql);
@@ -136,6 +136,7 @@ if ($conn) {
                     <li class="nav-item">
                         <a class="nav-link" href="#budget">Budget</a>
                     </li>
+                    <?php if ($is_logged_in): ?>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-user"></i> <?= htmlspecialchars($user_name) ?>
@@ -146,6 +147,7 @@ if ($conn) {
                             <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                         </ul>
                     </li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>
@@ -154,16 +156,26 @@ if ($conn) {
     <!-- Hero Section -->
     <section class="hero" id="home">
         <div class="hero-content">
-            <h1>Welcome back, <?= htmlspecialchars($user_name) ?>!</h1>
-            <p>Take Control of Your Finances. Track income, manage expenses, and achieve your financial goals with ease and precision.</p>
-            <div class="hero-buttons">
-                <a href="#budget" class="btn btn-primary">Get Started</a>
-                <button class="btn btn-outline">View Reports</button>
-            </div>
+            <?php if ($is_logged_in): ?>
+                <h1>Welcome back, <?= htmlspecialchars($user_name) ?>!</h1>
+                <p>Take Control of Your Finances. Track income, manage expenses, and achieve your financial goals with ease and precision.</p>
+                <div class="hero-buttons">
+                    <a href="#budget" class="btn btn-primary">Get Started</a>
+                    <button class="btn btn-outline">View Reports</button>
+                </div>
+            <?php else: ?>
+                <h1>Budget Tracker</h1>
+                <p>Plan budgets, track expenses, and stay on top of your finances. Create an account or log in to get started.</p>
+                <div class="hero-buttons">
+                    <a href="auth/signup.php" class="btn btn-primary">Sign Up</a>
+                    <a href="login.php" class="btn btn-outline">Login</a>
+                </div>
+            <?php endif; ?>
         </div>
     </section>
 
-    <!-- Monthly Summary - MOVED RIGHT AFTER HERO -->
+    <!-- Monthly Summary - show only when logged in -->
+    <?php if ($is_logged_in): ?>
     <section class="section" id="summary">
         <h2 class="section-title">Monthly Summary</h2>
         <div class="summary-section">
@@ -197,12 +209,13 @@ if ($conn) {
             </div>
         </div>
     </section>
+    <?php endif; ?>
 <!-- Transactions Section -->
 <section class="section" id="transactions">
     <div class="section-header">
         <h2 class="section-title">Recent Transactions</h2>
         <p class="section-description">Your latest income and expense records</p>
-        <a href="transactions.php" class="btn btn-outline">View All Transactions</a>
+        <a href="<?= $is_logged_in ? 'transactions.php' : 'login.php' ?>" class="btn btn-outline">View All Transactions</a>
     </div>
     <div class="transactions-list">
         <!-- Transaction items will go here -->
@@ -214,7 +227,7 @@ if ($conn) {
     <div class="section-header">
         <h2 class="section-title">Your Budgets</h2>
         <p class="section-description">Track your spending against budget limits</p>
-        <a href="budgets.php" class="btn btn-outline">Manage Budgets</a>
+        <a href="<?= $is_logged_in ? 'budgets.php' : 'login.php' ?>" class="btn btn-outline">Manage Budgets</a>
     </div>
     <div class="budgets-list">
         <!-- Budget progress bars will go here -->
