@@ -7,10 +7,11 @@ session_start();
 $is_logged_in = false;
 $user_id = $_SESSION['user_id'] ?? null;
 $user_name = 'User';
+$is_admin = false;
 
 // Verify session against database; only then consider user logged in
 if ($conn && $user_id) {
-    $user_sql = "SELECT name FROM users WHERE id = ?";
+    $user_sql = "SELECT name, role FROM users WHERE id = ?";
     $user_stmt = $conn->prepare($user_sql);
     if ($user_stmt) {
         $user_stmt->bind_param("i", $user_id);
@@ -19,10 +20,46 @@ if ($conn && $user_id) {
         if ($user_data = $user_result->fetch_assoc()) {
             $is_logged_in = true;
             $user_name = $user_data['name'] ?: 'User';
+            $is_admin = isset($user_data['role']) && $user_data['role'] === 'admin';
         } else {
             // Stale session: clear user-related session vars
             unset($_SESSION['user_id'], $_SESSION['user_name']);
         }
+
+// Admin metrics (only when admin)
+$total_users = 0;
+$new_users_30d = 0;
+$tx_count_30d = 0;
+$sum_expenses_30d = 0;
+$sum_income_30d = 0;
+if ($conn && $is_admin) {
+    // Total users
+    if ($res = $conn->query("SELECT COUNT(*) AS c FROM users")) {
+        $row = $res->fetch_assoc();
+        $total_users = (int)($row['c'] ?? 0);
+    }
+    // New users in last 30 days
+    if ($res = $conn->query("SELECT COUNT(*) AS c FROM users WHERE created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)")) {
+        $row = $res->fetch_assoc();
+        $new_users_30d = (int)($row['c'] ?? 0);
+    }
+    // Transactions last 30 days (if table exists)
+    if ($t = $conn->query("SHOW TABLES LIKE 'transactions'")) {
+        if ($t->num_rows > 0) {
+            if ($res = $conn->query("SELECT 
+                    COUNT(*) AS cnt,
+                    COALESCE(SUM(CASE WHEN type='expense' THEN amount END),0) AS exp_sum,
+                    COALESCE(SUM(CASE WHEN type='income' THEN amount END),0) AS inc_sum
+                FROM transactions 
+                WHERE date >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)")) {
+                $row = $res->fetch_assoc();
+                $tx_count_30d = (int)($row['cnt'] ?? 0);
+                $sum_expenses_30d = (float)($row['exp_sum'] ?? 0);
+                $sum_income_30d = (float)($row['inc_sum'] ?? 0);
+            }
+        }
+    }
+}
         $user_stmt->close();
     }
 }
@@ -138,6 +175,11 @@ if ($conn && $is_logged_in) {
                     <li class="nav-item">
                         <a class="nav-link" href="#budget">Budget</a>
                     </li>
+                    <?php if ($is_admin): ?>
+                    <li class="nav-item">
+                        <a class="nav-link" href="admin/users.php">Users</a>
+                    </li>
+                    <?php endif; ?>
                     <?php if ($is_logged_in): ?>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
@@ -175,6 +217,40 @@ if ($conn && $is_logged_in) {
             <?php endif; ?>
         </div>
     </section>
+
+    <?php if ($is_admin): ?>
+    <section class="section" id="admin-panel">
+        <h2 class="section-title">Admin Panel</h2>
+        <div class="summary-section">
+            <div class="summary-grid">
+                <div class="summary-item">
+                    <h3>Total Users</h3>
+                    <div class="summary-amount"><?php echo $total_users; ?></div>
+                </div>
+                <div class="summary-item">
+                    <h3>New Users (30d)</h3>
+                    <div class="summary-amount"><?php echo $new_users_30d; ?></div>
+                </div>
+                <div class="summary-item">
+                    <h3>Transactions (30d)</h3>
+                    <div class="summary-amount"><?php echo $tx_count_30d; ?></div>
+                </div>
+                <div class="summary-item">
+                    <h3>Expenses (30d)</h3>
+                    <div class="summary-amount">$<?php echo number_format($sum_expenses_30d, 2); ?></div>
+                </div>
+                <div class="summary-item">
+                    <h3>Income (30d)</h3>
+                    <div class="summary-amount">$<?php echo number_format($sum_income_30d, 2); ?></div>
+                </div>
+                <div class="summary-item">
+                    <h3>Manage Users</h3>
+                    <a class="btn btn-outline" href="admin/users.php">Open</a>
+                </div>
+            </div>
+        </div>
+    </section>
+    <?php endif; ?>
 
     <!-- Monthly Summary - show only when logged in -->
     <?php if ($is_logged_in): ?>
