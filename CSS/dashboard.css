@@ -10,6 +10,7 @@
   --text: #2f2b28;
   --radius: 16px;
   --shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+  --nav-h: 80px; /* default, will be updated via JS */
 }
 
 * {
@@ -21,7 +22,7 @@ html, body {
   scroll-behavior: smooth;
 }
 html {
-  scroll-padding-top: 100px;
+  scroll-padding-top: 0;
 }
 
 body {
@@ -61,8 +62,8 @@ h1, h2, h3, h4, h5, h6, .brand-title, .btn {
 
 /* Navigation */
 .navbar {
-  background: rgba(255, 255, 255, 0);
-  backdrop-filter: blur(10px);
+  background: transparent !important;
+  backdrop-filter: none;
   padding: 15px 5%;
   position: fixed;
   width: 100%;
@@ -76,7 +77,7 @@ h1, h2, h3, h4, h5, h6, .brand-title, .btn {
 
 
 .navbar.scrolled {
-  box-shadow: var(--shadow);
+  box-shadow: none;
   padding: 10px 5%;
 }
 
@@ -135,12 +136,16 @@ h1, h2, h3, h4, h5, h6, .brand-title, .btn {
 
 /* Hero Section */
 .hero {
-  min-height: 100vh;
+  min-height: calc(100vh - var(--nav-h));
   display: flex;
   align-items: center;
-  padding: 100px 5% 80px;
+  padding: calc(var(--nav-h) + 20px) 5% 0;
   position: relative;
   overflow: hidden;
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(6px);
+  border-radius: 0;
+  width: 100%;
 }
 
 .hero-content {
@@ -210,18 +215,31 @@ h1, h2, h3, h4, h5, h6, .brand-title, .btn {
 }
 
 .section {
-  min-height: 100vh; /* Full viewport height */
-  padding: 80px 5%;
+  min-height: calc(100vh - var(--nav-h)); /* Full viewport height minus navbar */
+  padding: 80px 5% 0; /* remove bottom padding to avoid empty strip */
   position: relative;
   overflow: hidden;
-  opacity: 0;
-  transform: translateY(40px);
+  opacity: 1; /* visible by default */
+  transform: none; /* no initial offset */
   transition: all 0.8s ease;
   margin: 0; /* Remove the 40px margin */
-  border-radius: var(--radius);
+  border-radius: 0; /* Full-bleed background matches section bounds */
+  width: 100%;
   display: flex;
   flex-direction: column;
   justify-content: center; /* Center content vertically */
+  background: rgba(255, 255, 255, 0.6);
+  backdrop-filter: blur(6px);
+  scroll-margin-top: var(--nav-h);
+}
+/* Prefer dynamic viewport height on supported browsers to avoid bottom gaps */
+@supports (height: 100dvh) {
+  .hero {
+    min-height: calc(100dvh - var(--nav-h));
+  }
+  .section {
+    min-height: calc(100dvh - var(--nav-h));
+  }
 }
 
 /* For sections with header/content structure */
@@ -240,10 +258,13 @@ h1, h2, h3, h4, h5, h6, .brand-title, .btn {
 }
 
 /* Individual section backgrounds */
+#home {
+  scroll-margin-top: var(--nav-h);
+}
 #summary {
-  scroll-margin-top: 100px;
-  padding-top: 100px;
-  /* REMOVE the background property */
+  scroll-margin-top: var(--nav-h);
+  padding-top: 90px;
+  /* Keep section spacing consistent with other sections */
 }
 
 .section-title {
@@ -395,8 +416,8 @@ h1, h2, h3, h4, h5, h6, .brand-title, .btn {
   }
   
   .section {
-    margin: 20px 1%;
-    padding: 60px 3%;
+    margin: 0;
+    padding: 80px 5%;
   }
   
   

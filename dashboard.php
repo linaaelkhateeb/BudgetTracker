@@ -104,10 +104,10 @@ if ($conn) {
     <link rel="stylesheet" href="CSS/dashboard.css">
     <style>
         .section {
-            margin-bottom: 3rem;
+            margin-bottom: 0;
         }
         .summary-section {
-            margin-top: 2rem;
+            margin-top: 0;
         }
     </style>
 </head>
@@ -117,7 +117,7 @@ if ($conn) {
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
                 <div class="brand-badge">BP</div>
-                <div class="brand-title">Budget Planner</div>
+                <div class="brand-title">Budget Trackerrr</div>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -222,18 +222,18 @@ if ($conn) {
 </section>
     <style>
     #summary {
-        margin-top: -0px !important;
+        margin-top: 0 !important;
     }
     .section-header {
-    text-align: center;
-    margin-bottom: 2rem;
-}
+        text-align: center;
+        margin-bottom: 2rem;
+    }
 
-.section-description {
-    color: #666;
-    margin-bottom: 1rem;
-}
-</style>
+    .section-description {
+        color: #666;
+        margin-bottom: 1rem;
+    }
+    </style>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/dashboard.js"></script>

@@ -58,6 +58,9 @@ function checkScroll() {
     } else {
         document.querySelector('.navbar').classList.remove('scrolled');
     }
+
+    // Keep CSS var in sync with navbar height during scroll (height may change)
+    updateNavHeightVar();
 }
 
 // Populate category options based on transaction type
@@ -138,6 +141,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     initializeData();
     
+    // Initialize CSS var for navbar height
+    updateNavHeightVar();
+
     // Set up scroll listener
     window.addEventListener('scroll', checkScroll);
     checkScroll(); // Check on initial load
@@ -189,19 +195,36 @@ document.addEventListener('DOMContentLoaded', function() {
   
     // Force check scroll after a short delay to catch any initial visibility
     setTimeout(checkScroll, 100);
+
+    // Update navbar height variable on resize
+    window.addEventListener('resize', onResizeUpdateNavVar);
 });
 
-// Smooth scrolling for navigation links
+// Smooth scrolling for navigation links with dynamic navbar offset
 document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {
+        const href = this.getAttribute('href');
+        if (!href || href === '#') return;
+        const target = document.querySelector(href);
+        if (!target) return;
+
         e.preventDefault();
-        const target = document.querySelector(this.getAttribute('href'));
-        if (target) {
-            const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - 50;
-            window.scrollTo({
-                top: targetPosition,
-                behavior: 'smooth'
-            });
+        const navbar = document.querySelector('.navbar');
+        const offset = navbar ? navbar.offsetHeight : 0;
+        // Add extra pixels ONLY for #summary to scroll more downward
+        const extra = href === '#summary' ? 120 : 0; // tweak 40–120px to taste
+       const targetPosition = target.getBoundingClientRect().top + window.pageYOffset - offset + extra;
+
+        window.scrollTo({
+            top: targetPosition,
+            behavior: 'smooth'
+        });
+
+        // Collapse mobile navbar if open
+        const navbarCollapse = document.getElementById('navbarNav');
+        if (navbarCollapse && navbarCollapse.classList.contains('show')) {
+            const bsCollapse = bootstrap.Collapse.getOrCreateInstance(navbarCollapse);
+            bsCollapse.hide();
         }
     });
 });
