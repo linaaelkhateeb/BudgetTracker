@@ -1,0 +1,192 @@
+/* Page background for settings */
+body.settings-page {
+  background: var(--neutral-light);
+  min-height: 100vh;
+}
+.settings-hero {
+  background: linear-gradient(135deg, var(--neutral-light), var(--secondary));
+  border: 1px solid rgba(198,184,162,0.6);
+  border-radius: 16px;
+  padding: 20px;
+  box-shadow: 0 12px 30px rgba(0,0,0,0.08);
+  position: relative;
+  overflow: hidden;
+  z-index: 0;
+}
+.settings-hero .brand-badge {
+  background: var(--primary);
+  color: #fff;
+  position: static; /* avoid absolute styles from global pages */
+}
+.hero-sub {
+  color: var(--text);
+  opacity: 0.85;
+}
+
+.side-card {
+  border: 1px solid rgba(198,184,162,0.6);
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+}
+.settings-side .nav-link {
+  text-align: left;
+  color: var(--text);
+  border-radius: 12px;
+  padding: 10px 12px;
+}
+.settings-side .nav-link:hover {
+  background: rgba(161,104,85,0.08);
+}
+.settings-side .nav-link.active {
+  background: var(--primary);
+  color: #fff;
+  box-shadow: 0 8px 20px rgba(123,75,58,0.25);
+}
+
+.card {
+  border: 1px solid rgba(198,184,162,0.55);
+  border-radius: 16px;
+  box-shadow: 0 6px 16px rgba(0,0,0,0.08);
+  background: #fff;
+}
+
+.form-label {
+  color: var(--support-1);
+  font-weight: 600;
+}
+
+.btn-primary {
+  background: var(--primary);
+  border-color: var(--primary);
+  color: #fff;
+  box-shadow: 0 6px 16px rgba(123,75,58,0.22);
+}
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 12px 28px rgba(123,75,58,0.28);
+}
+
+/* Chips and quick actions */
+.chip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 12px;
+  border-radius: 12px;
+  border: 1px solid rgba(198,184,162,0.55);
+  background: linear-gradient(135deg, rgba(255,255,255,0.85), rgba(198,184,162,0.15));
+  box-shadow: 0 6px 16px rgba(0,0,0,0.06);
+  flex-wrap: wrap;
+}
+.stat-chip { min-height: 44px; }
+.chip-flex { display: flex; align-items: center; }
+.chip-title { font-family: "Poppins", sans-serif; font-weight: 700; font-size: 1.05rem; color: var(--text); }
+.chip-count { font-weight: 700; font-size: 1.05rem; color: var(--primary); background: rgba(123,75,58,0.08); padding: 2px 8px; border-radius: 8px; }
+.chip-select, .chip-input { min-width: 120px; max-width: 160px; }
+.chip .view-toggle .btn { padding: 2px 8px; }
+.chip .view-toggle .btn.active { background: rgba(198,184,162,0.25); }
+.chip .form-select, .chip .form-control { flex: 0 0 auto; }
+.chip form { display: flex; align-items: center; gap: 8px; }
+
+.quick-actions .btn { border-radius: 10px; }
+.btn-outline-secondary { border-color: rgba(198,184,162,0.75); color: var(--text); }
+.btn-outline-secondary:hover { background: rgba(198,184,162,0.2); }
+
+/* Section headers */
+.section-head { padding: 6px 0 12px; border-bottom: 1px dashed rgba(198,184,162,0.6); margin-bottom: 12px; }
+.section-head h5 { font-weight: 800; color: var(--primary); }
+.section-sub { color: var(--support-1); font-size: 0.95rem; background: rgba(161,104,85,0.08); border: 1px solid rgba(161,104,85,0.22); padding: 4px 10px; border-radius: 999px; }
+
+/* Category grid cards */
+.category-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; }
+.cat-card { transition: transform .2s ease, box-shadow .2s ease; }
+.cat-card:hover { transform: translateY(-3px); box-shadow: 0 10px 22px rgba(0,0,0,0.12); }
+
+/* Center and size category controls */
+.category-controls form { max-width: 640px; width: 100%; margin: 0 auto; }
+
+/* Inline editable category name */
+.editable-name { cursor: text; border-bottom: 1px dashed transparent; }
+.editable-name:hover { border-bottom-color: rgba(198,184,162,0.7); }
+
+/* Color preset chips */
+.color-chip { width: 24px; height: 24px; border-radius: 6px; border: 1px solid rgba(0,0,0,0.12); cursor: pointer; }
+
+/* Icon picker helper */
+.icon-input { font-family: "Poppins", sans-serif; }
+.icon-preview { width: 28px; height: 28px; display:inline-flex; align-items:center; justify-content:center; border-radius: 8px; background: rgba(198,184,162,0.18); border: 1px solid rgba(198,184,162,0.45); }
+
+/* Password strength meter */
+.strength { height: 8px; border-radius: 999px; background: rgba(198,184,162,0.35); overflow: hidden; }
+.strength-bar { height: 100%; width: 0%; background: #e74c3c; transition: width .25s ease, background .25s ease; }
+.strength-label { font-size: 0.9rem; color: var(--support-1); }
+.pwd-toggle { cursor: pointer; user-select: none; }
+
+/* Shortcuts modal */
+.kbd { display:inline-block; padding: 2px 6px; border:1px solid rgba(0,0,0,0.2); border-bottom-width:2px; border-radius:6px; background:#fff; font-size: .9rem; }
+
+/* Empty states */
+.empty-card {
+  display: grid;
+  place-items: center;
+  text-align: center;
+  padding: 24px;
+  border: 1px dashed rgba(198,184,162,0.6);
+  border-radius: 16px;
+  background: linear-gradient(135deg, rgba(198,184,162,0.12), rgba(161,104,85,0.06));
+}
+.empty-card i { font-size: 2rem; color: var(--support-1); margin-bottom: 8px; }
+.empty-title { font-weight: 700; color: var(--text); }
+.empty-text { color: var(--support-1); }
+
+/* Misc */
+.chip .form-select.form-select-sm, .chip .form-control.form-control-sm { padding-top: 4px; padding-bottom: 4px; }
+
+/* Ensure stacking and spacing so lists don't overlap mid-page */
+.tab-content { position: relative; z-index: 1; }
+.list-group, .table { background: #fff; }
+.list-group-item { background-color: #fff; }
+.category-grid, .table-responsive { margin-top: 6px; }
+
+@media (max-width: 576px) {
+  .chip { flex-direction: column; align-items: stretch; }
+  .chip form { width: 100%; }
+  .chip-select, .chip-input { width: 100%; max-width: 100%; }
+}
+
+.table thead th {
+  color: var(--support-1);
+  font-weight: 700;
+}
+
+.category-color {
+  border: 1px solid rgba(198,184,162,0.6);
+}
+
+.list-group-item {
+  border-color: rgba(198,184,162,0.4);
+}
+.badge.bg-secondary {
+  background: var(--support-1) !important;
+}
+
+input.form-control, select.form-select {
+  border: 1px solid rgba(198,184,162,0.75);
+  border-radius: 10px;
+}
+input.form-control:focus, select.form-select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 0.25rem rgba(161,104,85,0.25);
+}
+
+.modal-content {
+  border: 1px solid rgba(198,184,162,0.55);
+  border-radius: 16px;
+  box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+}
+.modal-header {
+  border-bottom-color: rgba(198,184,162,0.4);
+}
+.modal-footer {
+  border-top-color: rgba(198,184,162,0.4);
+}
