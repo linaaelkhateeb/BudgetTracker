@@ -164,33 +164,35 @@ if ($conn && $is_logged_in) {
                     <li class="nav-item">
                         <a class="nav-link active" href="#home">Home</a>
                     </li>
-                    <?php if ($is_logged_in): ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#summary">Summary</a>
-                    </li>
-                    <?php endif; ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#transactions">Transactions</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#budget">Budget</a>
-                    </li>
                     <?php if ($is_admin): ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="admin/users.php">Users</a>
-                    </li>
-                    <?php endif; ?>
-                    <?php if ($is_logged_in): ?>
-                    <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
-                            <i class="fas fa-user"></i> <?= htmlspecialchars($user_name) ?>
-                        </a>
-                        <ul class="dropdown-menu">
-                            <li><a class="dropdown-item" href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="auth/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
-                        </ul>
-                    </li>
+                        <li class="nav-item"><a class="nav-link" href="#admin-panel">Admin Panel</a></li>
+                        <li class="nav-item"><a class="nav-link" href="admin/users.php">Users</a></li>
+                        <li class="nav-item"><a class="nav-link" href="settings.php">Settings</a></li>
+                        <li class="nav-item"><a class="nav-link" href="auth/logout.php">Logout</a></li>
+                    <?php else: ?>
+                        <?php if ($is_logged_in): ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#summary">Summary</a>
+                        </li>
+                        <?php endif; ?>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#transactions">Transactions</a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="#budget">Budget</a>
+                        </li>
+                        <?php if ($is_logged_in): ?>
+                        <li class="nav-item dropdown">
+                            <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
+                                <i class="fas fa-user"></i> <?= htmlspecialchars($user_name) ?>
+                            </a>
+                            <ul class="dropdown-menu">
+                                <li><a class="dropdown-item" href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
+                                <li><hr class="dropdown-divider"></li>
+                                <li><a class="dropdown-item" href="auth/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                            </ul>
+                        </li>
+                        <?php endif; ?>
                     <?php endif; ?>
                 </ul>
             </div>
@@ -252,8 +254,8 @@ if ($conn && $is_logged_in) {
     </section>
     <?php endif; ?>
 
-    <!-- Monthly Summary - show only when logged in -->
-    <?php if ($is_logged_in): ?>
+    <!-- Monthly Summary - show only when logged in and not admin -->
+    <?php if ($is_logged_in && !$is_admin): ?>
     <section class="section" id="summary">
         <h2 class="section-title">Monthly Summary</h2>
         <div class="summary-section">
@@ -288,7 +290,8 @@ if ($conn && $is_logged_in) {
         </div>
     </section>
     <?php endif; ?>
-<!-- Transactions Section -->
+<!-- Transactions Section (hide for admins) -->
+<?php if (!$is_admin): ?>
 <section class="section" id="transactions">
     <div class="section-header">
         <h2 class="section-title">Recent Transactions</h2>
@@ -300,7 +303,10 @@ if ($conn && $is_logged_in) {
     </div>
 </section>
 
-<!-- Budgets Section -->
+<?php endif; ?>
+
+<!-- Budgets Section (hide for admins) -->
+<?php if (!$is_admin): ?>
 <section class="section" id="budget">
     <div class="section-header">
         <h2 class="section-title">Your Budgets</h2>
@@ -311,6 +317,7 @@ if ($conn && $is_logged_in) {
         <!-- Budget progress bars will go here -->
     </div>
 </section>
+<?php endif; ?>
     <style>
     #summary {
         margin-top: 0 !important;
