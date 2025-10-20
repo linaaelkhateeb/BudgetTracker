@@ -3,36 +3,66 @@
 require_once 'includes/database.php';
 session_start();
 
-// Temporary mock session for development - REMOVE LATER
-if (!isset($_SESSION['user_id'])) {
-    $_SESSION['user_id'] = 1;
-    $_SESSION['user_name'] = 'John Doe';
-}
+// Initialize auth variables
+$is_logged_in = false;
+$user_id = $_SESSION['user_id'] ?? null;
+$user_name = 'User';
 
-$user_id = $_SESSION['user_id'];
-
-// Initialize variables with default values
-$user_name = $_SESSION['user_name'] ?? 'User';
-$total_income = 4250.00;
-$total_expenses = 2840.00;
-$balance = $total_income - $total_expenses;
-
-// Safely get user data from database
-if ($conn) {
-    // Check if users table exists and get user data
+// Verify session against database; only then consider user logged in
+if ($conn && $user_id) {
     $user_sql = "SELECT name FROM users WHERE id = ?";
     $user_stmt = $conn->prepare($user_sql);
-    
     if ($user_stmt) {
         $user_stmt->bind_param("i", $user_id);
         $user_stmt->execute();
         $user_result = $user_stmt->get_result();
         if ($user_data = $user_result->fetch_assoc()) {
-            $user_name = $user_data['name'];
+            $is_logged_in = true;
+            $user_name = $user_data['name'] ?: 'User';
+        } else {
+            // Stale session: clear user-related session vars
+            unset($_SESSION['user_id'], $_SESSION['user_name']);
         }
         $user_stmt->close();
     }
-    
+}
+
+// Get REAL financial data from database (only when logged in)
+$total_income = 0;
+$total_expenses = 0;
+
+if ($conn && $is_logged_in) {
+    // Get current month income
+    $income_sql = "SELECT COALESCE(SUM(amount), 0) as total FROM transactions 
+                   WHERE user_id = ? AND type = 'income' 
+                   AND MONTH(date) = MONTH(CURRENT_DATE()) 
+                   AND YEAR(date) = YEAR(CURRENT_DATE())";
+    $income_stmt = $conn->prepare($income_sql);
+    $income_stmt->bind_param("i", $user_id);
+    $income_stmt->execute();
+    $income_result = $income_stmt->get_result();
+    $income_data = $income_result->fetch_assoc();
+    $total_income = $income_data['total'] ?: 0;
+    $income_stmt->close();
+
+    // Get current month expenses  
+    $expense_sql = "SELECT COALESCE(SUM(amount), 0) as total FROM transactions 
+                    WHERE user_id = ? AND type = 'expense' 
+                    AND MONTH(date) = MONTH(CURRENT_DATE()) 
+                    AND YEAR(date) = YEAR(CURRENT_DATE())";
+    $expense_stmt = $conn->prepare($expense_sql);
+    $expense_stmt->bind_param("i", $user_id);
+    $expense_stmt->execute();
+    $expense_result = $expense_stmt->get_result();
+    $expense_data = $expense_result->fetch_assoc();
+    $total_expenses = $expense_data['total'] ?: 0;
+    $expense_stmt->close();
+
+    $balance = $total_income - $total_expenses;
+}
+
+// Safely get summary data if transactions table exists (logged in only)
+if ($conn && $is_logged_in) {
     // Try to get summary data if transactions table exists
     $summary_sql = "SHOW TABLES LIKE 'transactions'";
     $table_result = $conn->query($summary_sql);
@@ -74,10 +104,10 @@ if ($conn) {
     <link rel="stylesheet" href="CSS/dashboard.css">
     <style>
         .section {
-            margin-bottom: 3rem;
+            margin-bottom: 0;
         }
         .summary-section {
-            margin-top: 2rem;
+            margin-top: 0;
         }
     </style>
 </head>
@@ -87,7 +117,7 @@ if ($conn) {
         <div class="container-fluid">
             <a class="navbar-brand" href="#">
                 <div class="brand-badge">BP</div>
-                <div class="brand-title">Budget Planner</div>
+                <div class="brand-title">Budget Trackerrr</div>
             </a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
@@ -106,9 +136,7 @@ if ($conn) {
                     <li class="nav-item">
                         <a class="nav-link" href="#budget">Budget</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#actions">Quick Actions</a>
-                    </li>
+                    <?php if ($is_logged_in): ?>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-user"></i> <?= htmlspecialchars($user_name) ?>
@@ -119,6 +147,7 @@ if ($conn) {
                             <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                         </ul>
                     </li>
+                    <?php endif; ?>
                 </ul>
             </div>
         </div>
@@ -127,19 +156,29 @@ if ($conn) {
     <!-- Hero Section -->
     <section class="hero" id="home">
         <div class="hero-content">
-            <h1>Welcome back, <?= htmlspecialchars($user_name) ?>!</h1>
-            <p>Take Control of Your Finances. Track income, manage expenses, and achieve your financial goals with ease and precision.</p>
-            <div class="hero-buttons">
-                <button class="btn btn-primary" id="get-started">Add Transaction</button>
-                <button class="btn btn-outline">View Reports</button>
-            </div>
+            <?php if ($is_logged_in): ?>
+                <h1>Welcome back, <?= htmlspecialchars($user_name) ?>!</h1>
+                <p>Take Control of Your Finances. Track income, manage expenses, and achieve your financial goals with ease and precision.</p>
+                <div class="hero-buttons">
+                    <a href="#budget" class="btn btn-primary">Get Started</a>
+                    <button class="btn btn-outline">View Reports</button>
+                </div>
+            <?php else: ?>
+                <h1>Budget Tracker</h1>
+                <p>Plan budgets, track expenses, and stay on top of your finances. Create an account or log in to get started.</p>
+                <div class="hero-buttons">
+                    <a href="auth/signup.php" class="btn btn-primary">Sign Up</a>
+                    <a href="login.php" class="btn btn-outline">Login</a>
+                </div>
+            <?php endif; ?>
         </div>
     </section>
 
-    <!-- Monthly Summary - MOVED RIGHT AFTER HERO -->
+    <!-- Monthly Summary - show only when logged in -->
+    <?php if ($is_logged_in): ?>
     <section class="section" id="summary">
         <h2 class="section-title">Monthly Summary</h2>
-        <div class="summary-section fade-in">
+        <div class="summary-section">
             <div class="summary-grid">
                 <div class="summary-item income">
                     <div class="summary-icon">
@@ -162,7 +201,7 @@ if ($conn) {
                         <i class="fas fa-wallet"></i>
                     </div>
                     <h3>Balance</h3>
-                    <div class="summary-amount" id="balance" style="color: <?= $balance >= 0 ? '#2ecc71' : '#e74c3c' ?>">
+                    <div class="summary-amount" id="balance">
                         $<?= number_format($balance, 2) ?>
                     </div>
                     <p>This Month</p>
@@ -170,53 +209,44 @@ if ($conn) {
             </div>
         </div>
     </section>
-
-    <!-- Recent Transactions Section -->
-    <section class="section" id="transactions">
+    <?php endif; ?>
+<!-- Transactions Section -->
+<section class="section" id="transactions">
+    <div class="section-header">
         <h2 class="section-title">Recent Transactions</h2>
-        <div class="transactions-section fade-in">
-            <?php
-            // Get recent transactions
-            $transactions_sql = "SELECT * FROM transactions WHERE user_id = ? ORDER BY date DESC LIMIT 5";
-            $transactions_stmt = $conn->prepare($transactions_sql);
-            if ($transactions_stmt) {
-                $transactions_stmt->bind_param("i", $user_id);
-                $transactions_stmt->execute();
-                $transactions_result = $transactions_stmt->get_result();
-                
-                if ($transactions_result->num_rows > 0): ?>
-                    <div class="transactions-list">
-                        <?php while($transaction = $transactions_result->fetch_assoc()): ?>
-                            <div class="transaction-item">
-                                <div class="transaction-info">
-                                    <div class="transaction-desc"><?= htmlspecialchars($transaction['description']) ?></div>
-                                    <div class="transaction-category"><?= htmlspecialchars($transaction['category']) ?></div>
-                                    <div class="transaction-date"><?= date('M j, Y', strtotime($transaction['date'])) ?></div>
-                                </div>
-                                <div class="transaction-amount <?= $transaction['type'] ?>">
-                                    <?= $transaction['type'] == 'income' ? '+' : '-' ?>$<?= number_format($transaction['amount'], 2) ?>
-                                </div>
-                            </div>
-                        <?php endwhile; ?>
-                    </div>
-                <?php else: ?>
-                    <div class="no-transactions">
-                        <p>No transactions yet. <a href="#" id="add-first-transaction">Add your first transaction!</a></p>
-                    </div>
-                <?php endif;
-                $transactions_stmt->close();
-            } else {
-                echo '<div class="no-transactions"><p>Unable to load transactions.</p></div>';
-            }
-            ?>
-        </div>
-    </section>
+        <p class="section-description">Your latest income and expense records</p>
+        <a href="<?= $is_logged_in ? 'transactions.php' : 'login.php' ?>" class="btn btn-outline">View All Transactions</a>
+    </div>
+    <div class="transactions-list">
+        <!-- Transaction items will go here -->
+    </div>
+</section>
+
+<!-- Budgets Section -->
+<section class="section" id="budget">
+    <div class="section-header">
+        <h2 class="section-title">Your Budgets</h2>
+        <p class="section-description">Track your spending against budget limits</p>
+        <a href="<?= $is_logged_in ? 'budgets.php' : 'login.php' ?>" class="btn btn-outline">Manage Budgets</a>
+    </div>
+    <div class="budgets-list">
+        <!-- Budget progress bars will go here -->
+    </div>
+</section>
     <style>
     #summary {
-        margin-top: 0px !important;
-        transform: translateY(-50px);
+        margin-top: 0 !important;
     }
-</style>
+    .section-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+
+    .section-description {
+        color: #666;
+        margin-bottom: 1rem;
+    }
+    </style>
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/dashboard.js"></script>
