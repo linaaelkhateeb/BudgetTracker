@@ -13,9 +13,39 @@ $user_id = $_SESSION['user_id'];
 
 // Initialize variables with default values
 $user_name = $_SESSION['user_name'] ?? 'User';
-$total_income = 4250.00;
-$total_expenses = 2840.00;
-$balance = $total_income - $total_expenses;
+// Get REAL financial data from database
+$total_income = 0;
+$total_expenses = 0;
+
+if ($conn) {
+    // Get current month income
+    $income_sql = "SELECT COALESCE(SUM(amount), 0) as total FROM transactions 
+                   WHERE user_id = ? AND type = 'income' 
+                   AND MONTH(date) = MONTH(CURRENT_DATE()) 
+                   AND YEAR(date) = YEAR(CURRENT_DATE())";
+    $income_stmt = $conn->prepare($income_sql);
+    $income_stmt->bind_param("i", $user_id);
+    $income_stmt->execute();
+    $income_result = $income_stmt->get_result();
+    $income_data = $income_result->fetch_assoc();
+    $total_income = $income_data['total'] ?: 0;
+    $income_stmt->close();
+
+    // Get current month expenses  
+    $expense_sql = "SELECT COALESCE(SUM(amount), 0) as total FROM transactions 
+                    WHERE user_id = ? AND type = 'expense' 
+                    AND MONTH(date) = MONTH(CURRENT_DATE()) 
+                    AND YEAR(date) = YEAR(CURRENT_DATE())";
+    $expense_stmt = $conn->prepare($expense_sql);
+    $expense_stmt->bind_param("i", $user_id);
+    $expense_stmt->execute();
+    $expense_result = $expense_stmt->get_result();
+    $expense_data = $expense_result->fetch_assoc();
+    $total_expenses = $expense_data['total'] ?: 0;
+    $expense_stmt->close();
+
+    $balance = $total_income - $total_expenses;
+}
 
 // Safely get user data from database
 if ($conn) {
@@ -106,9 +136,6 @@ if ($conn) {
                     <li class="nav-item">
                         <a class="nav-link" href="#budget">Budget</a>
                     </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="#actions">Quick Actions</a>
-                    </li>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown">
                             <i class="fas fa-user"></i> <?= htmlspecialchars($user_name) ?>
@@ -130,7 +157,7 @@ if ($conn) {
             <h1>Welcome back, <?= htmlspecialchars($user_name) ?>!</h1>
             <p>Take Control of Your Finances. Track income, manage expenses, and achieve your financial goals with ease and precision.</p>
             <div class="hero-buttons">
-                <button class="btn btn-primary" id="get-started">Add Transaction</button>
+                <a href="#budget" class="btn btn-primary">Get Started</a>
                 <button class="btn btn-outline">View Reports</button>
             </div>
         </div>
@@ -139,7 +166,7 @@ if ($conn) {
     <!-- Monthly Summary - MOVED RIGHT AFTER HERO -->
     <section class="section" id="summary">
         <h2 class="section-title">Monthly Summary</h2>
-        <div class="summary-section fade-in">
+        <div class="summary-section">
             <div class="summary-grid">
                 <div class="summary-item income">
                     <div class="summary-icon">
@@ -162,7 +189,7 @@ if ($conn) {
                         <i class="fas fa-wallet"></i>
                     </div>
                     <h3>Balance</h3>
-                    <div class="summary-amount" id="balance" style="color: <?= $balance >= 0 ? '#2ecc71' : '#e74c3c' ?>">
+                    <div class="summary-amount" id="balance">
                         $<?= number_format($balance, 2) ?>
                     </div>
                     <p>This Month</p>
@@ -183,7 +210,7 @@ if ($conn) {
 </section>
 
 <!-- Budgets Section -->
-<section class="section" id="budgets">
+<section class="section" id="budget">
     <div class="section-header">
         <h2 class="section-title">Your Budgets</h2>
         <p class="section-description">Track your spending against budget limits</p>
@@ -196,7 +223,6 @@ if ($conn) {
     <style>
     #summary {
         margin-top: -0px !important;
-        transform: translateY(-50px);
     }
     .section-header {
     text-align: center;
