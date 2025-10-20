@@ -26,6 +26,44 @@ if ($conn && $user_id) {
             unset($_SESSION['user_id'], $_SESSION['user_name']);
         }
 
+// Admin charts datasets
+$monthly_labels = [];
+$monthly_signups = [];
+$ym2 = [];
+$inc = [];
+$exp = [];
+$cat_labels = [];
+$cat_values = [];
+
+if ($conn && $is_admin) {
+    // Monthly signups from users.created_at
+    if ($res = $conn->query("SELECT DATE_FORMAT(created_at, '%Y-%m') AS ym, COUNT(*) c FROM users GROUP BY ym ORDER BY ym ASC")) {
+        while ($row = $res->fetch_assoc()) {
+            $monthly_labels[] = $row['ym'];
+            $monthly_signups[] = (int)($row['c'] ?? 0);
+        }
+    }
+    // Income vs Expenses by month from transactions
+    if ($t = $conn->query("SHOW TABLES LIKE 'transactions'")) {
+        if ($t->num_rows > 0) {
+            if ($res = $conn->query("SELECT DATE_FORMAT(date, '%Y-%m') AS ym,\n                    COALESCE(SUM(CASE WHEN type='income' THEN amount END),0) inc,\n                    COALESCE(SUM(CASE WHEN type='expense' THEN amount END),0) exp\n                FROM transactions GROUP BY ym ORDER BY ym ASC")) {
+                while ($row = $res->fetch_assoc()) {
+                    $ym2[] = $row['ym'];
+                    $inc[] = (float)$row['inc'];
+                    $exp[] = (float)$row['exp'];
+                }
+            }
+            // Top expense categories (all-time)
+            if ($res = $conn->query("SELECT category, SUM(amount) total FROM transactions WHERE type='expense' GROUP BY category ORDER BY total DESC LIMIT 6")) {
+                while ($row = $res->fetch_assoc()) {
+                    $cat_labels[] = $row['category'] ?: 'Uncategorized';
+                    $cat_values[] = (float)$row['total'];
+                }
+            }
+        }
+    }
+}
+
 // Admin metrics (only when admin)
 $total_users = 0;
 $new_users_30d = 0;
@@ -38,20 +76,19 @@ if ($conn && $is_admin) {
         $row = $res->fetch_assoc();
         $total_users = (int)($row['c'] ?? 0);
     }
-    // New users in last 30 days
-    if ($res = $conn->query("SELECT COUNT(*) AS c FROM users WHERE created_at >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)")) {
+    // New users (all-time)
+    if ($res = $conn->query("SELECT COUNT(*) AS c FROM users")) {
         $row = $res->fetch_assoc();
         $new_users_30d = (int)($row['c'] ?? 0);
     }
-    // Transactions last 30 days (if table exists)
+    // Transactions totals (all-time) (if table exists)
     if ($t = $conn->query("SHOW TABLES LIKE 'transactions'")) {
         if ($t->num_rows > 0) {
             if ($res = $conn->query("SELECT 
                     COUNT(*) AS cnt,
                     COALESCE(SUM(CASE WHEN type='expense' THEN amount END),0) AS exp_sum,
                     COALESCE(SUM(CASE WHEN type='income' THEN amount END),0) AS inc_sum
-                FROM transactions 
-                WHERE date >= DATE_SUB(CURRENT_DATE(), INTERVAL 30 DAY)")) {
+                FROM transactions")) {
                 $row = $res->fetch_assoc();
                 $tx_count_30d = (int)($row['cnt'] ?? 0);
                 $sum_expenses_30d = (float)($row['exp_sum'] ?? 0);
@@ -230,24 +267,40 @@ if ($conn && $is_logged_in) {
                     <div class="summary-amount"><?php echo $total_users; ?></div>
                 </div>
                 <div class="summary-item">
-                    <h3>New Users (30d)</h3>
+                    <h3>New Users</h3>
                     <div class="summary-amount"><?php echo $new_users_30d; ?></div>
                 </div>
                 <div class="summary-item">
-                    <h3>Transactions (30d)</h3>
+                    <h3>Transactions</h3>
                     <div class="summary-amount"><?php echo $tx_count_30d; ?></div>
                 </div>
                 <div class="summary-item">
-                    <h3>Expenses (30d)</h3>
+                    <h3>Total Expenses</h3>
                     <div class="summary-amount">$<?php echo number_format($sum_expenses_30d, 2); ?></div>
                 </div>
                 <div class="summary-item">
-                    <h3>Income (30d)</h3>
+                    <h3>Total Income</h3>
                     <div class="summary-amount">$<?php echo number_format($sum_income_30d, 2); ?></div>
                 </div>
                 <div class="summary-item">
                     <h3>Manage Users</h3>
                     <a class="btn btn-outline" href="admin/users.php">Open</a>
+                </div>
+            </div>
+        </div>
+        <div class="summary-section" style="margin-top:24px">
+            <div class="summary-grid">
+                <div class="summary-item" style="display:block">
+                    <h3>Monthly Signups</h3>
+                    <canvas id="chartSignups" height="120"></canvas>
+                </div>
+                <div class="summary-item" style="display:block">
+                    <h3>Income vs Expenses</h3>
+                    <canvas id="chartIncomeExpense" height="120"></canvas>
+                </div>
+                <div class="summary-item" style="display:block">
+                    <h3>Top Expense Categories</h3>
+                    <canvas id="chartTopCategories" height="120"></canvas>
                 </div>
             </div>
         </div>
@@ -335,5 +388,64 @@ if ($conn && $is_logged_in) {
 
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="js/dashboard.js"></script>
+    <?php if ($is_admin): ?>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script>
+    (function(){
+      const labelsSignups = <?= json_encode($monthly_labels) ?>;
+      const dataSignups = <?= json_encode($monthly_signups) ?>;
+      const labelsYM = <?= json_encode($ym2) ?>;
+      const dataIncome = <?= json_encode($inc) ?>;
+      const dataExpense = <?= json_encode($exp) ?>;
+      const labelsCats = <?= json_encode($cat_labels) ?>;
+      const dataCats = <?= json_encode($cat_values) ?>;
+
+      const palette = {
+        primary: '#7B4B3A',
+        secondary: '#667D6E',
+        accent: '#E5B8A6',
+        danger: '#D26969',
+        info: '#5BA3D9',
+        neutral: '#9AA1A9',
+      };
+
+      const ctx1 = document.getElementById('chartSignups');
+      if (ctx1 && labelsSignups && labelsSignups.length) {
+        new Chart(ctx1, {
+          type: 'bar',
+          data: { labels: labelsSignups, datasets: [{ label: 'Signups', data: dataSignups, backgroundColor: palette.secondary, borderRadius: 6 }] },
+          options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } }, plugins: { legend: { display:false } } }
+        });
+      }
+
+      const ctx2 = document.getElementById('chartIncomeExpense');
+      if (ctx2 && labelsYM && labelsYM.length) {
+        new Chart(ctx2, {
+          type: 'line',
+          data: {
+            labels: labelsYM,
+            datasets: [
+              { label: 'Income', data: dataIncome, borderColor: palette.primary, backgroundColor: '#7B4B3A33', tension: .3, fill: true },
+              { label: 'Expenses', data: dataExpense, borderColor: palette.danger, backgroundColor: '#D2696933', tension: .3, fill: true }
+            ]
+          },
+          options: { responsive: true, maintainAspectRatio: false, scales: { y: { beginAtZero: true } } }
+        });
+      }
+
+      const ctx3 = document.getElementById('chartTopCategories');
+      if (ctx3 && labelsCats && labelsCats.length) {
+        new Chart(ctx3, {
+          type: 'doughnut',
+          data: {
+            labels: labelsCats,
+            datasets: [{ data: dataCats, backgroundColor: [palette.primary, palette.secondary, palette.accent, palette.info, palette.danger, palette.neutral], borderWidth: 0 }]
+          },
+          options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { position: 'bottom' } }, cutout: '60%' }
+        });
+      }
+    })();
+    </script>
+    <?php endif; ?>
 </body>
 </html>

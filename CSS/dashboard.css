@@ -297,6 +297,21 @@ h1, h2, h3, h4, h5, h6, .brand-title, .btn {
   font-size: 1.4rem;
 }
 
+/* Admin charts: fixed, responsive height to avoid expansion */
+#admin-panel .summary-section .summary-item canvas {
+  width: 100% !important;
+  height: 260px !important;
+  max-height: 260px;
+  display: block;
+}
+
+/* Make charts two columns on large screens */
+@media (min-width: 992px) {
+  #admin-panel .summary-section .summary-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
 /* Monthly Summary */
 .summary-section {
   border: 1px solid rgba(255, 255, 255, 0.18);
