@@ -356,6 +356,19 @@ h1, h2, h3, h4, h5, h6, .brand-title, .btn {
 .section-actions { text-align: center; margin-top: 14px; }
 .section-actions .btn { min-width: 220px; }
 
+/* Tighter spacing for Transactions and Budget sections */
+#transactions .section-title,
+#budget .section-title { margin-bottom: 6px; }
+#transactions .section-description,
+#budget .section-description { margin-bottom: 8px; }
+#transactions .transactions-list { margin-top: 0; }
+#budget .budgets-list { margin-top: 0; }
+#transactions .section-actions,
+#budget .section-actions { margin-top: 10px; }
+/* Override default .section-header spacing for these sections */
+#transactions .section-header,
+#budget .section-header { margin-bottom: 10px; }
+
 /* Budget mini-cards */
 .budget-grid { display: grid; gap: 14px; grid-template-columns: 1fr; }
 @media (min-width: 768px) { .budget-grid { grid-template-columns: 1fr 1fr; } }

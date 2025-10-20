@@ -258,7 +258,7 @@ if ($conn && $is_logged_in) {
                                 <i class="fas fa-user"></i> <?= htmlspecialchars($user_name) ?>
                             </a>
                             <ul class="dropdown-menu">
-                                <li><a class="dropdown-item" href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
+                                <li><a class="dropdown-item" href="users/userssettings.php"><i class="fas fa-cog"></i> Settings</a></li>
                                 <li><hr class="dropdown-divider"></li>
                                 <li><a class="dropdown-item" href="auth/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                             </ul>
@@ -278,7 +278,7 @@ if ($conn && $is_logged_in) {
                 <p>Take Control of Your Finances. Track income, manage expenses, and achieve your financial goals with ease and precision.</p>
                 <div class="hero-buttons">
                     <a href="#budget" class="btn btn-primary">Get Started</a>
-                    <button class="btn btn-outline">View Reports</button>
+                    <a href="users/userssettings.php" class="btn btn-outline">Profile</a>
                 </div>
             <?php else: ?>
                 <h1>Budget Tracker</h1>
@@ -453,6 +453,9 @@ if ($conn && $is_logged_in) {
         <?php else: ?>
         <p class="empty-note">Please log in to view budgets.</p>
         <?php endif; ?>
+    </div>
+    <div class="section-actions">
+        <a href="<?= $is_logged_in ? 'budgets.php' : 'login.php' ?>" class="btn btn-outline">Manage Budgets</a>
     </div>
 </section>
 <?php endif; ?>
