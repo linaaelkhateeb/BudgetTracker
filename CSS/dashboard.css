@@ -322,6 +322,58 @@ h1, h2, h3, h4, h5, h6, .brand-title, .btn {
   transition: all 0.8s ease;
 }
 
+/* Recent Activity (transactions) */
+.transactions-list { padding: 8px 0; }
+.txn-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 12px; }
+.txn-item {
+  display: grid;
+  grid-template-columns: 44px 1fr;
+  gap: 12px;
+  align-items: center;
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 12px 14px;
+}
+.txn-icon {
+  width: 44px; height: 44px; border-radius: 10px; display: grid; place-items: center;
+  color: #fff;
+}
+.txn-icon.inc { background: #4caf50; }
+.txn-icon.exp { background: #f44336; }
+.txn-meta { display: flex; flex-direction: column; gap: 6px; }
+.txn-top { display: flex; justify-content: space-between; align-items: center; }
+.txn-cat { font-weight: 600; color: var(--text); opacity: 0.9; }
+.txn-amount { font-weight: 700; }
+.txn-amount.inc { color: #2e7d32; }
+.txn-amount.exp { color: #c62828; }
+.txn-bottom { display: flex; justify-content: space-between; color: #666; font-size: 0.9rem; }
+.txn-link { text-decoration: none; color: var(--primary); font-weight: 600; }
+.empty-note { color: #666; text-align: center; padding: 8px 0; }
+
+/* Section action row (buttons under lists) */
+.section-actions { text-align: center; margin-top: 14px; }
+.section-actions .btn { min-width: 220px; }
+
+/* Budget mini-cards */
+.budget-grid { display: grid; gap: 14px; grid-template-columns: 1fr; }
+@media (min-width: 768px) { .budget-grid { grid-template-columns: 1fr 1fr; } }
+.budget-card {
+  background: rgba(255, 255, 255, 0.65);
+  backdrop-filter: blur(6px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 12px;
+  padding: 14px;
+}
+.budget-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+.budget-name { font-weight: 600; }
+.budget-amt { font-weight: 700; color: var(--primary); }
+.budget-bar { position: relative; height: 10px; background: rgba(0,0,0,0.08); border-radius: 999px; overflow: hidden; }
+.budget-fill { height: 100%; background: linear-gradient(90deg, var(--primary), var(--accent)); border-radius: 999px; }
+.budget-foot { display: flex; justify-content: space-between; margin-top: 8px; font-size: 0.9rem; color: #666; }
+.budget-link { text-decoration: none; color: var(--primary); font-weight: 600; }
+
 .summary-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));

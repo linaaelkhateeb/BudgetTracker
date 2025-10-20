@@ -26,6 +26,40 @@ if ($conn && $user_id) {
             unset($_SESSION['user_id'], $_SESSION['user_name']);
         }
 
+// Recent Activity (last 5 transactions for current user)
+$recent_txns = [];
+if ($conn && $is_logged_in) {
+    $chk = $conn->query("SHOW TABLES LIKE 'transactions'");
+    if ($chk && $chk->num_rows > 0) {
+        if ($stmt = $conn->prepare("SELECT id, date, category, type, amount FROM transactions WHERE user_id = ? ORDER BY date DESC, id DESC LIMIT 5")) {
+            $stmt->bind_param('i', $user_id);
+            $stmt->execute();
+            $res = $stmt->get_result();
+            while ($row = $res->fetch_assoc()) { $recent_txns[] = $row; }
+            $stmt->close();
+        }
+    }
+}
+
+// Budget mini-cards: Top 3 expense categories this month
+$budget_cards = [];
+if ($conn && $is_logged_in) {
+    $chk = $conn->query("SHOW TABLES LIKE 'transactions'");
+    if ($chk && $chk->num_rows > 0) {
+        $sql = "SELECT category, COALESCE(SUM(amount),0) AS total\n                FROM transactions\n                WHERE user_id = ? AND type='expense'\n                  AND MONTH(date) = MONTH(CURRENT_DATE())\n                  AND YEAR(date) = YEAR(CURRENT_DATE())\n                GROUP BY category\n                ORDER BY total DESC\n                LIMIT 3";
+        if ($stmt = $conn->prepare($sql)) {
+            $stmt->bind_param('i', $user_id);
+            $stmt->execute();
+            $res = $stmt->get_result();
+            while ($row = $res->fetch_assoc()) { $budget_cards[] = $row; }
+            $stmt->close();
+        }
+    }
+}
+$budget_max = 0;
+foreach ($budget_cards as $bc) { $budget_max = max($budget_max, (float)$bc['total']); }
+if ($budget_max <= 0) { $budget_max = 1; }
+
 // Admin charts datasets
 $monthly_labels = [];
 $monthly_signups = [];
@@ -349,10 +383,38 @@ if ($conn && $is_logged_in) {
     <div class="section-header">
         <h2 class="section-title">Recent Transactions</h2>
         <p class="section-description">Your latest income and expense records</p>
-        <a href="<?= $is_logged_in ? 'transactions.php' : 'login.php' ?>" class="btn btn-outline">View All Transactions</a>
     </div>
     <div class="transactions-list">
-        <!-- Transaction items will go here -->
+        <?php if ($is_logged_in && !empty($recent_txns)): ?>
+        <ul class="txn-list">
+            <?php foreach ($recent_txns as $t): ?>
+            <li class="txn-item">
+                <div class="txn-icon <?= $t['type'] === 'income' ? 'inc' : 'exp' ?>">
+                    <i class="fas <?= $t['type'] === 'income' ? 'fa-arrow-down' : 'fa-arrow-up' ?>"></i>
+                </div>
+                <div class="txn-meta">
+                    <div class="txn-top">
+                        <span class="txn-cat"><?= htmlspecialchars($t['category'] ?: 'General') ?></span>
+                        <span class="txn-amount <?= $t['type'] === 'income' ? 'inc' : 'exp' ?>">
+                            <?= $t['type'] === 'income' ? '+' : '-' ?>$<?= number_format((float)$t['amount'], 2) ?>
+                        </span>
+                    </div>
+                    <div class="txn-bottom">
+                        <span class="txn-date"><?= htmlspecialchars($t['date']) ?></span>
+                        <a class="txn-link" href="transactions.php">Details</a>
+                    </div>
+                </div>
+            </li>
+            <?php endforeach; ?>
+        </ul>
+        <?php elseif ($is_logged_in): ?>
+        <p class="empty-note">No recent activity yet.</p>
+        <?php else: ?>
+        <p class="empty-note">Please log in to see your activity.</p>
+        <?php endif; ?>
+    </div>
+    <div class="section-actions">
+        <a href="<?= $is_logged_in ? 'transactions.php' : 'login.php' ?>" class="btn btn-outline">View All Transactions</a>
     </div>
 </section>
 
@@ -364,10 +426,33 @@ if ($conn && $is_logged_in) {
     <div class="section-header">
         <h2 class="section-title">Your Budgets</h2>
         <p class="section-description">Track your spending against budget limits</p>
-        <a href="<?= $is_logged_in ? 'budgets.php' : 'login.php' ?>" class="btn btn-outline">Manage Budgets</a>
     </div>
     <div class="budgets-list">
-        <!-- Budget progress bars will go here -->
+        <?php if ($is_logged_in && !empty($budget_cards)): ?>
+        <div class="budget-grid">
+            <?php foreach ($budget_cards as $bc): 
+                $pct = max(0, min(100, round(((float)$bc['total'] / (float)$budget_max) * 100)));
+            ?>
+            <div class="budget-card">
+                <div class="budget-head">
+                    <span class="budget-name"><?= htmlspecialchars($bc['category'] ?: 'General') ?></span>
+                    <span class="budget-amt">$<?= number_format((float)$bc['total'], 2) ?></span>
+                </div>
+                <div class="budget-bar">
+                    <div class="budget-fill" style="width: <?= $pct ?>%"></div>
+                </div>
+                <div class="budget-foot">
+                    <span class="budget-pct"><?= $pct ?>%</span>
+                    <a class="budget-link" href="budgets.php">Manage</a>
+                </div>
+            </div>
+            <?php endforeach; ?>
+        </div>
+        <?php elseif ($is_logged_in): ?>
+        <p class="empty-note">No budget activity this month.</p>
+        <?php else: ?>
+        <p class="empty-note">Please log in to view budgets.</p>
+        <?php endif; ?>
     </div>
 </section>
 <?php endif; ?>

@@ -3,7 +3,7 @@
 $host = "localhost";
 $user = "root";
 $pass = "";
-$db = "budgettracker"; // change to your database name
+$db = "budgettracker"; // ghayarooha l esm el database 3andoko
 $conn = mysqli_connect($host, $user, $pass, $db);
 
 if (!$conn) {
