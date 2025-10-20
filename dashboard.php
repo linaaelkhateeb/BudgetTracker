@@ -127,9 +127,11 @@ if ($conn && $is_logged_in) {
                     <li class="nav-item">
                         <a class="nav-link active" href="#home">Home</a>
                     </li>
+                    <?php if ($is_logged_in): ?>
                     <li class="nav-item">
                         <a class="nav-link" href="#summary">Summary</a>
                     </li>
+                    <?php endif; ?>
                     <li class="nav-item">
                         <a class="nav-link" href="#transactions">Transactions</a>
                     </li>
@@ -144,7 +146,7 @@ if ($conn && $is_logged_in) {
                         <ul class="dropdown-menu">
                             <li><a class="dropdown-item" href="settings.php"><i class="fas fa-cog"></i> Settings</a></li>
                             <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
+                            <li><a class="dropdown-item" href="auth/logout.php"><i class="fas fa-sign-out-alt"></i> Logout</a></li>
                         </ul>
                     </li>
                     <?php endif; ?>
